@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="fa" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="مرجع تعاملی و موضوع‌محور جلسهٔ چهارم یادگیری ماشین: ارزیابی، آماده‌سازی داده، مدل‌های خطی، اعتبارسنجی و تحویل مدل">
+  <title>Learning Hub جلسهٔ ۴ یادگیری ماشین</title>
+  <style>
+    /*
+      DESIGN CONTRACT v2
+      Tokens: color/space/radius/shadow only in :root.
+      Components: badge, note, metric, flow, diagram, table-shell, code-block, tabs, quiz.
+      Interaction: all state uses data-* / aria-*; no section-specific JS or inline styles.
+    */
+    :root{
+      color-scheme:dark;--bg:#020617;--surface:#0f172a;--surface-2:#111c31;--surface-3:#172033;--line:#2b3a55;
+      --text:#cbd5e1;--heading:#f8fafc;--muted:#94a3b8;--brand:#67e8f9;--brand-2:#22d3ee;--accent:#fbbf24;
+      --ok:#86efac;--danger:#fda4af;--violet:#c4b5fd;--focus:#facc15;--overlay:rgba(2,6,23,.72);
+      --r-sm:.55rem;--r-md:.85rem;--r-lg:1.25rem;--shadow:0 18px 45px rgba(0,0,0,.28);--content:980px;--side:285px
+    }
+    html[data-theme="light"]{
+      color-scheme:light;--bg:#f1f5f9;--surface:#fff;--surface-2:#f8fafc;--surface-3:#e2e8f0;--line:#cbd5e1;
+      --text:#334155;--heading:#0f172a;--muted:#64748b;--brand:#0369a1;--brand-2:#0284c7;--accent:#a16207;
+      --ok:#166534;--danger:#be123c;--violet:#6d28d9;--focus:#a16207;--overlay:rgba(15,23,42,.48);--shadow:0 16px 38px rgba(15,23,42,.1)
+    }
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:5.25rem}body{margin:0;background:var(--bg);color:var(--text);font-family:Vazirmatn,Vazir,Tahoma,Arial,sans-serif;line-height:1.95}body.drawer-open{overflow:hidden}
+    a{color:var(--brand)}button,input{font:inherit}button{cursor:pointer}h1,h2,h3,h4,strong{color:var(--heading)}h1{font-size:clamp(2.2rem,5vw,4rem);line-height:1.38;margin:.9rem 0}h2{font-size:clamp(1.5rem,3vw,2.05rem);line-height:1.55}h3{font-size:1.18rem;line-height:1.65}code,bdi,.ltr,pre{direction:ltr;unicode-bidi:isolate}code{background:var(--surface-3);color:var(--brand);padding:.08rem .36rem;border-radius:.34rem;font-size:.9em}
+    :focus-visible{outline:3px solid var(--focus);outline-offset:3px}.skip-link{position:fixed;z-index:100;top:.5rem;right:.5rem;transform:translateY(-150%);background:var(--heading);color:var(--bg);padding:.55rem .85rem;border-radius:var(--r-sm)}.skip-link:focus{transform:none}
+    .appbar{position:sticky;top:0;z-index:50;height:4.2rem;display:flex;align-items:center;gap:.65rem;padding:.65rem max(1rem,calc((100vw - 1380px)/2));background:color-mix(in srgb,var(--bg) 90%,transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.brand{margin-inline-end:auto;color:var(--heading);font-weight:900}.icon-btn,.search-trigger{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:var(--r-sm);min-height:2.65rem;padding:.45rem .75rem}.menu-btn{display:none}.search-trigger{display:flex;align-items:center;gap:.55rem;min-width:230px;justify-content:space-between}.shortcut{border:1px solid var(--line);border-bottom-width:2px;border-radius:.35rem;padding:.05rem .42rem;color:var(--muted);font-size:.78rem}
+    .shell{max-width:1380px;margin:auto;display:grid;grid-template-columns:var(--side) minmax(0,var(--content));gap:2rem;padding:2rem}.sidebar{position:sticky;top:5.5rem;align-self:start;max-height:calc(100vh - 7rem);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:1rem;box-shadow:var(--shadow)}.sidebar-title{font-weight:900;color:var(--heading);padding:.2rem .65rem .65rem}.nav-group{border-top:1px solid var(--line);padding:.4rem 0}.nav-group summary{cursor:pointer;color:var(--heading);font-weight:800;padding:.35rem .65rem;border-radius:var(--r-sm)}.nav-group summary:hover{background:var(--surface-2)}.toc-link{display:block;text-decoration:none;color:var(--muted);padding:.34rem .7rem;border-radius:var(--r-sm);font-size:.83rem;line-height:1.55;border-right:3px solid transparent}.toc-link:hover{background:var(--surface-2);color:var(--brand)}.toc-link[aria-current="true"]{background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand);border-right-color:var(--brand);font-weight:900}.sidebar-note{border-top:1px solid var(--line);margin-top:.6rem;padding:.8rem .65rem 0;color:var(--muted);font-size:.74rem}
+    main{min-width:0;display:flex;flex-direction:column;gap:1.5rem;padding-bottom:5rem}.hero,.section{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow)}.hero{padding:4rem 3rem;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--brand) 22%,transparent),transparent 35%),radial-gradient(circle at 95% 100%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 34%),var(--surface)}.hero p{font-size:1.08rem;color:var(--muted);max-width:790px}.hero-actions,.badge-row,.path-grid{display:flex;gap:.6rem;flex-wrap:wrap}.hero-actions{margin-top:1.3rem}.section{padding:2rem;scroll-margin-top:5.3rem}.section-head{display:flex;align-items:flex-start;gap:.8rem;border-bottom:1px solid var(--line);padding-bottom:.8rem;margin-bottom:1.2rem}.section-head h2{margin:0}.permalink{margin-inline-start:auto;border:0;background:transparent;color:var(--muted);border-radius:var(--r-sm);padding:.35rem;opacity:.7}.permalink:hover{color:var(--brand);opacity:1}.subhead{display:flex;align-items:center;gap:.55rem;margin-top:1.6rem}.subhead h3{margin:0}.section p{margin:.4rem 0 1rem}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;text-decoration:none;border:1px solid var(--line);background:var(--surface-2);color:var(--heading);border-radius:var(--r-sm);padding:.52rem .8rem;font-weight:800}.btn.primary{border-color:var(--brand-2);background:color-mix(in srgb,var(--brand) 14%,var(--surface));color:var(--brand)}.badge{display:inline-flex;align-items:center;border:1px solid color-mix(in srgb,var(--brand) 45%,var(--line));background:color-mix(in srgb,var(--brand) 10%,transparent);color:var(--brand);border-radius:999px;padding:.15rem .62rem;font-size:.78rem;font-weight:850}.badge.extra{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent)}
+    .path-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:1.1rem}.path-card,.metric,.panel-card{border:1px solid var(--line);background:var(--surface-2);border-radius:var(--r-md);padding:1rem}.path-card{text-decoration:none;color:var(--text);transition:transform .18s,border-color .18s}.path-card:hover{transform:translateY(-3px);border-color:var(--brand)}.path-card strong{display:block;margin-bottom:.25rem}.path-card span{font-size:.86rem;color:var(--muted)}
+    .note{border-right:4px solid var(--brand);background:color-mix(in srgb,var(--brand) 8%,var(--surface-2));border-radius:var(--r-md);padding:1rem 1.1rem;margin:1rem 0}.note[data-tone="warning"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--surface-2))}.note[data-tone="danger"]{border-color:var(--danger);background:color-mix(in srgb,var(--danger) 8%,var(--surface-2))}.note[data-tone="success"]{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 8%,var(--surface-2))}.note p:last-child{margin-bottom:0}
+    .metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}.metric{transition:border-color .18s,transform .18s}.metric:hover{border-color:var(--brand);transform:translateY(-2px)}.metric-name{font-weight:900;color:var(--heading)}.metric-question{color:var(--brand);font-size:.9rem}.metric small{display:block;color:var(--muted);margin-top:.4rem}
+    .flow{display:flex;align-items:stretch;gap:.45rem;overflow:auto;padding:.3rem 0}.flow-step{min-width:130px;flex:1;border:1px solid var(--line);background:var(--surface-2);border-radius:var(--r-sm);padding:.75rem;text-align:center;font-weight:850;color:var(--heading)}.flow-arrow{align-self:center;color:var(--brand)}
+    .diagram{border:1px solid var(--line);background:var(--surface-2);border-radius:var(--r-md);padding:1rem;margin:1rem 0}.diagram-head{font-weight:900;color:var(--heading);margin-bottom:.8rem}.diagram-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.55rem;align-items:center}.diagram-node{border:1px solid var(--line);border-radius:var(--r-sm);padding:.75rem;text-align:center;background:var(--surface);min-height:78px;display:grid;place-items:center}.diagram-node[data-tone="brand"]{border-color:var(--brand);color:var(--brand)}.diagram-node[data-tone="accent"]{border-color:var(--accent);color:var(--accent)}.diagram-arrow{text-align:center;color:var(--brand);font-size:1.3rem}.diagram-caption{color:var(--muted);font-size:.82rem;text-align:center;margin-top:.7rem}
+    .tabs{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;margin:1rem 0;background:var(--surface-2)}.tab-list{display:flex;gap:.25rem;overflow:auto;padding:.45rem;border-bottom:1px solid var(--line)}.tab{white-space:nowrap;border:0;background:transparent;color:var(--muted);border-radius:var(--r-sm);padding:.55rem .8rem;font-weight:850}.tab[aria-selected="true"]{background:var(--surface);color:var(--brand);box-shadow:inset 0 0 0 1px var(--line)}.tab-panel{padding:1rem}.tab-panel[hidden]{display:none}
+    .disclosure{border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface-2);margin:.75rem 0}.disclosure>summary{cursor:pointer;color:var(--heading);font-weight:850;padding:.8rem 1rem}.disclosure[open]>summary{border-bottom:1px solid var(--line)}.disclosure-body{padding:1rem}.disclosure-body>:first-child{margin-top:0}.disclosure-body>:last-child{margin-bottom:0}
+    .table-shell{overflow:auto;border:1px solid var(--line);border-radius:var(--r-md);margin:1rem 0}table{width:100%;min-width:700px;border-collapse:collapse;text-align:right;font-size:.88rem}th{background:var(--surface-3);color:var(--heading);position:sticky;top:0}th,td{padding:.68rem .8rem;border-bottom:1px solid var(--line);vertical-align:top}tbody tr:hover td{background:color-mix(in srgb,var(--brand) 5%,transparent)}
+    .code-block{margin:1rem 0;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:#020617;color:#e2e8f0;direction:ltr}.code-head{display:flex;align-items:center;gap:.6rem;padding:.48rem .7rem;background:#111827;border-bottom:1px solid #334155;color:#94a3b8;font:600 .78rem/1.5 Consolas,monospace}.code-file{color:#e2e8f0}.code-language{margin-left:auto;color:#67e8f9}.copy-code{border:1px solid #334155;background:#172033;color:#e2e8f0;border-radius:.4rem;padding:.25rem .55rem}.code-block pre{margin:0;padding:.9rem 0;overflow:auto;line-height:1.65;tab-size:4}.code-block code{display:block;background:none;padding:0;color:inherit;font:400 .82rem/1.65 Consolas,monospace}.line{display:block;padding:0 1rem;white-space:pre}.line::before{content:attr(data-line);display:inline-block;width:2.1rem;margin-right:.8rem;color:#475569;text-align:right}.line.hl{background:rgba(251,191,36,.1);border-left:3px solid #fbbf24}
+    .quiz{display:grid;gap:.65rem}.quiz details{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2)}.quiz summary{cursor:pointer;padding:.7rem .9rem;font-weight:850;color:var(--heading)}.quiz p{padding:0 .9rem .75rem;margin:0}
+    .section-nav{display:grid;grid-template-columns:1fr auto 1fr;gap:.6rem;border-top:1px solid var(--line);margin-top:1.6rem;padding-top:1rem}.section-nav a{text-decoration:none;border:1px solid var(--line);background:var(--surface-2);border-radius:var(--r-sm);padding:.55rem .7rem;color:var(--text);font-size:.82rem}.section-nav .next{text-align:left}.related{display:flex;gap:.35rem;align-items:center;flex-wrap:wrap;justify-content:center}.related a{padding:.3rem .52rem;color:var(--brand)}
+    .overlay{display:none;position:fixed;inset:0;z-index:60;background:var(--overlay);border:0;width:100%;height:100%}
+    dialog{width:min(720px,calc(100% - 2rem));max-height:min(720px,calc(100vh - 2rem));padding:0;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);color:var(--text);box-shadow:var(--shadow)}dialog::backdrop{background:var(--overlay)}.search-box{display:flex;align-items:center;gap:.5rem;padding:.75rem;border-bottom:1px solid var(--line)}.search-input{flex:1;border:0;background:transparent;color:var(--heading);font-size:1.05rem;outline:0}.close-search{border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:var(--r-sm);padding:.35rem .55rem}.search-results{list-style:none;margin:0;padding:.55rem;max-height:560px;overflow:auto}.search-results a{display:block;text-decoration:none;border-radius:var(--r-sm);padding:.7rem;color:var(--text)}.search-results a:hover,.search-results a:focus{background:var(--surface-2)}.result-title{display:block;color:var(--heading);font-weight:900}.result-snippet{display:block;color:var(--muted);font-size:.82rem}.search-empty{padding:1rem;color:var(--muted)}
+    .toast{position:fixed;z-index:110;left:1rem;bottom:1rem;background:var(--heading);color:var(--bg);padding:.55rem .8rem;border-radius:var(--r-sm);box-shadow:var(--shadow);opacity:0;transform:translateY(1rem);pointer-events:none;transition:.18s}.toast.show{opacity:1;transform:none}
+    @media(max-width:1050px){.appbar{padding-inline:1rem}.menu-btn{display:inline-flex}.search-trigger{min-width:0}.search-label{display:none}.shell{display:block;padding:1rem}.sidebar{position:fixed;z-index:70;top:0;right:0;height:100dvh;max-height:none;width:min(86vw,340px);border-radius:0;border-block:0;transform:translateX(105%);transition:transform .22s}.sidebar.open{transform:none}.overlay.show{display:block}.path-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.section{padding:1.35rem}.hero{padding:3rem 1.5rem}}
+    @media(max-width:640px){.brand{font-size:.88rem}.shortcut{display:none}.hero h1{font-size:2.15rem}.path-grid,.metric-grid{grid-template-columns:1fr}.diagram-grid{grid-template-columns:1fr}.diagram-arrow{transform:rotate(90deg)}.flow{display:grid;overflow:visible}.flow-arrow{transform:rotate(90deg);text-align:center}.section-nav{grid-template-columns:1fr 1fr}.related{grid-column:1/-1;grid-row:2}.tab-list{scrollbar-width:thin}.section-head{align-items:center}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+    @media print{.appbar,.sidebar,.overlay,.section-nav,.permalink,.toast{display:none!important}.shell{display:block;max-width:none;padding:0}.hero,.section{box-shadow:none;break-inside:avoid}.disclosure>.disclosure-body{display:block}.tab-panel[hidden]{display:block}.code-block{break-inside:avoid}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">رفتن به محتوای اصلی</a>
+  <header class="appbar">
+    <button class="icon-btn menu-btn" id="menu-button" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="بازکردن فهرست">☰</button>
+    <div class="brand">Learning Hub — جلسهٔ ۴</div>
+    <button class="search-trigger" id="search-trigger" type="button" aria-haspopup="dialog"><span class="search-label">جستجو در مفاهیم و کدها</span><span class="shortcut">Ctrl K</span></button>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="تغییر پوسته" title="تغییر پوسته">◐</button>
+  </header>
+  <button class="overlay" id="drawer-overlay" type="button" aria-label="بستن فهرست"></button>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar" aria-label="فهرست مستند">
+      <div class="sidebar-title">نقشهٔ یادگیری</div>
+      <nav>
+        <details class="nav-group" open><summary>شروع سریع</summary><a class="toc-link" href="#start">صفحهٔ شروع</a><a class="toc-link" href="#map">نقشهٔ تصمیم</a></details>
+        <details class="nav-group" open><summary>هستهٔ Workflow</summary><a class="toc-link" href="#evaluate">۱. ارزیابی</a><a class="toc-link" href="#prepare">۲. آماده‌سازی داده</a><a class="toc-link" href="#model">۳. ساخت مدل</a><a class="toc-link" href="#validate">۴. اعتبارسنجی و Tune</a><a class="toc-link" href="#deliver">۵. تحویل مدل</a></details>
+        <details class="nav-group"><summary>مرجع تکمیلی</summary><a class="toc-link" href="#vault">Parameter Vault</a><a class="toc-link" href="#quiz">خودآزمایی</a><a class="toc-link" href="#sources">منابع رسمی</a></details>
+      </nav>
+      <div class="sidebar-note">نسخهٔ غیرخطی و موضوع‌محور؛ جزئیات پیشرفته فقط هنگام نیاز باز می‌شوند.</div>
+    </aside>
+
+    <main id="main">
+      <section class="hero" id="start" data-search="شروع معرفی learning hub جلسه چهارم">
+        <span class="badge">مرجع موضوعی جلسهٔ چهارم</span>
+        <h1>مدل را بساز، درست بسنج، امن تحویل بده</h1>
+        <p>قرار نیست این صفحه را از اول تا آخر بخوانی. از مسئله‌ای که الان داری شروع کن؛ هر مسیر فقط بخش لازم را باز می‌کند و جزئیات پیشرفته تا وقتی نخواهی پنهان می‌مانند.</p>
+        <div class="hero-actions"><a class="btn primary" href="#map">مسیر مناسبم را پیدا کن</a><button class="btn" type="button" data-open-search>جستجو با Ctrl/Cmd + K</button></div>
+        <div class="path-grid" aria-label="مسیرهای سریع">
+          <a class="path-card" href="#evaluate"><strong>Metric می‌خواهم</strong><span>Regression، Classification و Imbalance</span></a>
+          <a class="path-card" href="#prepare"><strong>Pipeline می‌سازم</strong><span>Missing Data، Scaling و Leakage</span></a>
+          <a class="path-card" href="#model"><strong>Curve و Regularization</strong><span>Polynomial، Ridge و Lasso</span></a>
+          <a class="path-card" href="#deliver"><strong>مدل را منتشر می‌کنم</strong><span>Persistence، امنیت و Checklist</span></a>
+        </div>
+      </section>
+
+      <section class="section" id="map" data-related="evaluate,prepare,model" data-search="نقشه تصمیم workflow مسئله مدل metric pipeline">
+        <div class="section-head"><h2>نقشهٔ تصمیم؛ از سؤال شروع کن، نه از ابزار</h2></div>
+        <div class="diagram" role="img" aria-label="مسیر تصمیم از مسئله تا تحویل مدل">
+          <div class="diagram-head">Workflow جلسه در یک نگاه</div>
+          <div class="diagram-grid"><div class="diagram-node" data-tone="brand">چه چیزی را پیش‌بینی می‌کنم؟</div><div class="diagram-arrow">←</div><div class="diagram-node">داده چگونه آماده می‌شود؟</div><div class="diagram-arrow">←</div><div class="diagram-node" data-tone="accent">موفقیت را با چه می‌سنجم؟</div></div>
+          <div class="diagram-caption">بعد از این سه تصمیم سراغ Model، Tune و Persistence برو؛ نه قبل از آن.</div>
+        </div>
+        <div class="tabs" data-tabs>
+          <div class="tab-list" role="tablist" aria-label="انتخاب نوع مسئله">
+            <button class="tab" role="tab" id="map-tab-reg" aria-controls="map-panel-reg" aria-selected="true">خروجی عددی</button>
+            <button class="tab" role="tab" id="map-tab-cls" aria-controls="map-panel-cls" aria-selected="false" tabindex="-1">خروجی Class</button>
+            <button class="tab" role="tab" id="map-tab-time" aria-controls="map-panel-time" aria-selected="false" tabindex="-1">دادهٔ زمانی</button>
+          </div>
+          <div class="tab-panel" role="tabpanel" id="map-panel-reg" aria-labelledby="map-tab-reg"><strong>Regression:</strong> با Baseline شروع کن؛ RMSE/MAE/R² را کنار هم ببین؛ اگر رابطه Curve دارد Polynomial + Ridge را با CV مقایسه کن.</div>
+          <div class="tab-panel" role="tabpanel" id="map-panel-cls" aria-labelledby="map-tab-cls" hidden><strong>Classification:</strong> Confusion Matrix و هزینهٔ FP/FN را مشخص کن؛ بعد Precision/Recall/F1 و Threshold را انتخاب کن.</div>
+          <div class="tab-panel" role="tabpanel" id="map-panel-time" aria-labelledby="map-tab-time" hidden><strong>Time Series:</strong> Shuffle نکن؛ آینده را test بگذار؛ برای Tune از TimeSeriesSplit و در صورت نیاز gap استفاده کن.</div>
+        </div>
+      </section>
+
+      <section class="section" id="evaluate" data-related="map,validate,quiz" data-search="evaluation metric regression classification accuracy precision recall f1 rmse mae r2 mape imbalance threshold confusion matrix">
+        <div class="section-head"><div><div class="badge-row"><span class="badge">هستهٔ جلسه</span><span class="badge extra">تکمیل مرجع</span></div><h2>۱. ارزیابی؛ هر Metric یک سؤال متفاوت است</h2></div></div>
+        <p>به‌جای حفظ‌کردن فرمول‌ها، سؤال هر Metric را به خاطر بسپار. یک Metric اصلی برای انتخاب مدل داشته باش و دو Metric نگهبان برای اینکه نقطهٔ ضعفش پنهان نماند.</p>
+        <div class="tabs" data-tabs>
+          <div class="tab-list" role="tablist" aria-label="کاوش معیارها">
+            <button class="tab" role="tab" id="metric-tab-reg" aria-controls="metric-panel-reg" aria-selected="true">Regression</button>
+            <button class="tab" role="tab" id="metric-tab-cls" aria-controls="metric-panel-cls" aria-selected="false" tabindex="-1">Classification</button>
+            <button class="tab" role="tab" id="metric-tab-imb" aria-controls="metric-panel-imb" aria-selected="false" tabindex="-1">Imbalanced</button>
+          </div>
+          <div class="tab-panel" role="tabpanel" id="metric-panel-reg" aria-labelledby="metric-tab-reg">
+            <div class="metric-grid">
+              <article class="metric"><div class="metric-name">RMSE</div><div class="metric-question">Error معمولاً چقدر است؟</div><small>هم‌واحد با y؛ Error بزرگ را بیشتر جریمه می‌کند.</small></article>
+              <article class="metric"><div class="metric-name">MAE</div><div class="metric-question">قدر مطلق Error معمولاً چقدر است؟</div><small>از RMSE در برابر Outlier مقاوم‌تر است.</small></article>
+              <article class="metric"><div class="metric-name">R²</div><div class="metric-question">از حدس Mean بهتر شده‌ام؟</div><small>منفی یعنی حتی Baseline میانگین بهتر بوده است.</small></article>
+            </div>
+            <div class="note" data-tone="warning"><strong>MAPE:</strong> درصدی و خواناست، ولی وقتی y صفر یا نزدیک صفر باشد قابل اعتماد نیست.</div>
+          </div>
+          <div class="tab-panel" role="tabpanel" id="metric-panel-cls" aria-labelledby="metric-tab-cls" hidden>
+            <div class="metric-grid">
+              <article class="metric"><div class="metric-name">Precision</div><div class="metric-question">از Positiveهای گفته‌شده چندتا درست بود؟</div><small>وقتی False Positive گران است.</small></article>
+              <article class="metric"><div class="metric-name">Recall</div><div class="metric-question">از Positiveهای واقعی چندتا پیدا شد؟</div><small>وقتی False Negative خطرناک است.</small></article>
+              <article class="metric"><div class="metric-name">F1 / Fβ</div><div class="metric-question">تعادل Precision و Recall چطور است؟</div><small>با β می‌توانی وزن Recall یا Precision را بیشتر کنی.</small></article>
+            </div>
+          </div>
+          <div class="tab-panel" role="tabpanel" id="metric-panel-imb" aria-labelledby="metric-tab-imb" hidden>
+            <p>Accuracy را تنها نگذار. Balanced Accuracy، Macro F1 و Average Precision را ببین؛ Split را Stratified انجام بده و Threshold را بر اساس هزینهٔ FP/FN روی validation تنظیم کن.</p>
+            <div class="note" data-tone="danger"><strong>مثال کلاس:</strong> مدل «همیشه سالم» روی ۹۹۰ سالم و ۱۰ بیمار، Accuracy=99% دارد ولی Recall بیمار صفر است.</div>
+          </div>
+        </div>
+        <details class="disclosure"><summary>Metricهای تکمیلی که چه زمانی لازم می‌شوند؟</summary><div class="disclosure-body"><div class="table-shell"><table><thead><tr><th>Metric</th><th>زمان استفاده</th><th>دام</th></tr></thead><tbody><tr><td>Balanced Accuracy</td><td>Classهای نامتوازن</td><td>Probability quality را نمی‌سنجد.</td></tr><tr><td>Average Precision</td><td>Positive نادر و Ranking</td><td>به Prevalence حساس است.</td></tr><tr><td>ROC-AUC</td><td>مقایسهٔ Ranking روی Thresholdها</td><td>در Imbalance شدید می‌تواند خوش‌بینانه باشد.</td></tr><tr><td>Log Loss</td><td>کیفیت Probability و Confidence</td><td>پیش‌بینی مطمئن ولی غلط را شدید جریمه می‌کند.</td></tr><tr><td>MCC</td><td>خلاصهٔ متوازن Binary Classification</td><td>تفسیرش برای مخاطب غیرفنی سخت‌تر است.</td></tr><tr><td>MedianAE / Max Error</td><td>Robustness یا Worst case در Regression</td><td>به‌تنهایی تصویر کامل نمی‌دهند.</td></tr></tbody></table></div></div></details>
+        <details class="disclosure"><summary>کد کوتاه: یک گزارش چندمعیاره</summary><div class="disclosure-body">
+          <figure class="code-block" data-code><figcaption class="code-head"><span class="code-file">evaluate.py</span><span class="code-language">Python</span><button class="copy-code" type="button">Copy</button></figcaption><pre><code><span class="line" data-line="1">from sklearn.metrics import root_mean_squared_error, mean_absolute_error, r2_score</span><span class="line hl" data-line="2">print("RMSE", root_mean_squared_error(y_test, pred))</span><span class="line" data-line="3">print("MAE ", mean_absolute_error(y_test, pred))</span><span class="line" data-line="4">print("R²  ", r2_score(y_test, pred))</span></code></pre></figure>
+        </div></details>
+      </section>
+
+      <section class="section" id="prepare" data-related="model,evaluate,vault" data-search="preprocessing pipeline leakage scaler standard minmax robust imputer missing data functiontransformer fit transform">
+        <div class="section-head"><div><span class="badge">هستهٔ جلسه</span><h2>۲. آماده‌سازی داده؛ همه‌چیز داخل Pipeline</h2></div></div>
+        <p>هر Stepی که چیزی از داده یاد می‌گیرد—Mean، Min/Max، Median، همسایه یا Feature mapping—باید فقط روی train fit شود. Pipeline این قرارداد را خودکار نگه می‌دارد.</p>
+        <div class="diagram" role="img" aria-label="مسیر واکنش‌گرا پایپ‌لاین">
+          <div class="diagram-head">Pipeline امن</div>
+          <div class="diagram-grid"><div class="diagram-node">Raw X</div><div class="diagram-arrow">←</div><div class="diagram-node" data-tone="brand">Imputer</div><div class="diagram-arrow">←</div><div class="diagram-node" data-tone="accent">Scaler → Model</div></div>
+          <div class="diagram-caption">در موبایل Nodeها به‌جای Canvas عریض، عمودی Reflow می‌شوند.</div>
+        </div>
+        <div class="tabs" data-tabs>
+          <div class="tab-list" role="tablist" aria-label="انتخاب آماده سازی">
+            <button class="tab" role="tab" id="prep-tab-miss" aria-controls="prep-panel-miss" aria-selected="true">Missing Data</button>
+            <button class="tab" role="tab" id="prep-tab-scale" aria-controls="prep-panel-scale" aria-selected="false" tabindex="-1">Scaling</button>
+            <button class="tab" role="tab" id="prep-tab-custom" aria-controls="prep-panel-custom" aria-selected="false" tabindex="-1">Custom Transform</button>
+          </div>
+          <div class="tab-panel" role="tabpanel" id="prep-panel-miss" aria-labelledby="prep-tab-miss"><div class="metric-grid"><article class="metric"><div class="metric-name">SimpleImputer</div><div class="metric-question">راه ساده و قابل توضیح</div><small>mean، median، most_frequent یا constant؛ گزینهٔ add_indicator را فراموش نکن.</small></article><article class="metric"><div class="metric-name">KNNImputer</div><div class="metric-question">ردیف‌های مشابه چه می‌گویند؟</div><small>n_neighbors، weights و Scale روی نتیجه اثر دارند.</small></article><article class="metric"><div class="metric-name">MissingIndicator</div><div class="metric-question">خود Missingبودن Signal است؟</div><small>مقدار را پر نمی‌کند؛ یک Feature علامت اضافه می‌کند.</small></article></div></div>
+          <div class="tab-panel" role="tabpanel" id="prep-panel-scale" aria-labelledby="prep-tab-scale" hidden><div class="metric-grid"><article class="metric"><div class="metric-name">StandardScaler</div><div class="metric-question">Mean=0 و Variance=1</div><small>برای Regularization و Distance رایج؛ به Outlier حساس.</small></article><article class="metric"><div class="metric-name">MinMaxScaler</div><div class="metric-question">بازهٔ ثابت می‌خواهم</div><small>Outlier را حذف نمی‌کند؛ clip فقط خروجی را محدود می‌کند.</small></article><article class="metric"><div class="metric-name">RobustScaler</div><div class="metric-question">Outlier زیاد دارم</div><small>Median و IQR؛ توسعهٔ مرجع.</small></article></div></div>
+          <div class="tab-panel" role="tabpanel" id="prep-panel-custom" aria-labelledby="prep-tab-custom" hidden><p><code>FunctionTransformer</code> یک Function سفارشی را وارد Pipeline می‌کند. برای Persistence از Function نام‌دار استفاده کن؛ Lambda معمولاً pickle نمی‌شود. پارامترهای مفید: <code>inverse_func</code>، <code>validate</code>، <code>check_inverse</code> و <code>feature_names_out</code>.</p></div>
+        </div>
+        <div class="note" data-tone="danger"><strong>غلط:</strong> Scale/Impute روی کل Data و بعد Split. <strong>درست:</strong> Split و سپس <code>pipeline.fit(X_train, y_train)</code>.</div>
+        <details class="disclosure"><summary>کد استاندارد Pipeline را ببین</summary><div class="disclosure-body">
+          <figure class="code-block" data-code><figcaption class="code-head"><span class="code-file">pipeline.py</span><span class="code-language">Python</span><button class="copy-code" type="button">Copy</button></figcaption><pre><code><span class="line" data-line="1">from sklearn.pipeline import Pipeline</span><span class="line" data-line="2">from sklearn.impute import SimpleImputer</span><span class="line" data-line="3">from sklearn.preprocessing import StandardScaler</span><span class="line" data-line="4">from sklearn.linear_model import Ridge</span><span class="line" data-line="5"></span><span class="line hl" data-line="6">pipe = Pipeline([</span><span class="line hl" data-line="7">    ("imputer", SimpleImputer(strategy="median", add_indicator=True)),</span><span class="line hl" data-line="8">    ("scale", StandardScaler()),</span><span class="line hl" data-line="9">    ("model", Ridge(alpha=1.0)),</span><span class="line hl" data-line="10">])</span></code></pre></figure>
+        </div></details>
+      </section>
+
+      <section class="section" id="model" data-related="prepare,validate,vault" data-search="model polynomialfeatures linearregression ridge lasso regularization overfit underfit degree alpha hyperparameter">
+        <div class="section-head"><div><span class="badge">هستهٔ جلسه</span><h2>۳. ساخت مدل؛ Curve بساز، Complexity را مهار کن</h2></div></div>
+        <p><code>PolynomialFeatures</code> Model جدید نیست؛ Feature space را گسترش می‌دهد تا یک Linear Model بتواند Curve یاد بگیرد. مشکل اصلی، رشد سریع تعداد Featureها و Overfitting است.</p>
+        <div class="flow" aria-label="روند ساخت رگرسیون چندجمله ای"><div class="flow-step">x</div><div class="flow-arrow">←</div><div class="flow-step">1, x, x², …</div><div class="flow-arrow">←</div><div class="flow-step">Ridge / Lasso</div><div class="flow-arrow">←</div><div class="flow-step">Validation</div></div>
+        <div class="tabs" data-tabs>
+          <div class="tab-list" role="tablist" aria-label="مقایسه مدل های خطی">
+            <button class="tab" role="tab" id="model-tab-ols" aria-controls="model-panel-ols" aria-selected="true">LinearRegression</button>
+            <button class="tab" role="tab" id="model-tab-ridge" aria-controls="model-panel-ridge" aria-selected="false" tabindex="-1">Ridge</button>
+            <button class="tab" role="tab" id="model-tab-lasso" aria-controls="model-panel-lasso" aria-selected="false" tabindex="-1">Lasso</button>
+          </div>
+          <div class="tab-panel" role="tabpanel" id="model-panel-ols" aria-labelledby="model-tab-ols"><strong>بدون Penalty.</strong> Baseline شفاف است، ولی Featureهای هم‌بسته و degree بالا می‌توانند Coefficientها را ناپایدار کنند. اول از این شروع کن، نه اینکه همیشه با آن تمام کنی.</div>
+          <div class="tab-panel" role="tabpanel" id="model-panel-ridge" aria-labelledby="model-tab-ridge" hidden><strong>L2 Regularization.</strong> همهٔ Coefficientها را Shrink می‌کند و برای Polynomial Featureهای هم‌بسته انتخاب پیش‌فرض خوبی است. Hyperparameter اصلی: <code>alpha</code>.</div>
+          <div class="tab-panel" role="tabpanel" id="model-panel-lasso" aria-labelledby="model-tab-lasso" hidden><strong>L1 Regularization.</strong> می‌تواند بعضی Coefficientها را صفر کند. Hyperparameter اصلی <code>alpha</code> است؛ Scaleکردن Featureها قبلش اهمیت دارد.</div>
+        </div>
+        <div class="metric-grid"><article class="metric"><div class="metric-name">degree</div><div class="metric-question">Curve چقدر انعطاف داشته باشد؟</div><small>با CV انتخاب شود؛ عدد بزرگ‌تر الزاماً بهتر نیست.</small></article><article class="metric"><div class="metric-name">interaction_only</div><div class="metric-question">فقط Interaction می‌خواهم؟</div><small>Powerهای تکراری مثل x² را حذف می‌کند.</small></article><article class="metric"><div class="metric-name">include_bias</div><div class="metric-question">ستون یک‌ها لازم است؟</div><small>وقتی Model Intercept دارد معمولاً False شفاف‌تر است.</small></article></div>
+        <div class="note" data-tone="warning"><strong>نتیجهٔ فایل کلاس:</strong> degree=8 فقط بهترین Candidateهای امتحان‌شده بود؛ Test R² هنوز منفی ماند. «بهترین بین گزینه‌ها» با «مدل خوب» یکی نیست.</div>
+        <details class="disclosure"><summary>پارامترهای پیشرفتهٔ Ridge و Lasso</summary><div class="disclosure-body"><div class="table-shell"><table><thead><tr><th>Model</th><th>پارامتر</th><th>کاربرد</th></tr></thead><tbody><tr><td>Ridge</td><td><code>solver</code></td><td>auto، svd، cholesky، lsqr، sparse_cg، sag، saga یا lbfgs؛ نوع Data و Constraint مهم است.</td></tr><tr><td>Ridge</td><td><code>max_iter / tol</code></td><td>کنترل Convergence برای Solverهای Iterative.</td></tr><tr><td>Ridge</td><td><code>positive</code></td><td>Coefficientهای غیرمنفی در شرایط سازگار.</td></tr><tr><td>Lasso</td><td><code>selection</code></td><td>cyclic یا random؛ Random گاهی سریع‌تر Converge می‌کند.</td></tr><tr><td>Lasso</td><td><code>warm_start</code></td><td>شروع از Solution قبلی برای مسیر alphaها.</td></tr><tr><td>Lasso</td><td><code>max_iter / tol</code></td><td>رفع ConvergenceWarning و Trade-off دقت/زمان.</td></tr></tbody></table></div></div></details>
+        <details class="disclosure"><summary>LOF موجود در نوت‌بوک چه بود؟</summary><div class="disclosure-body"><p><code>LocalOutlierFactor</code> چگالی محلی هر Sample را با همسایه‌هایش مقایسه می‌کند. پارامترهای مهم: <code>n_neighbors</code>، <code>metric</code>، <code>contamination</code> و <code>novelty</code>. چون Distance-based است، Scaling مهم است. <code>novelty=False</code> برای Outlier detection روی Data موجود و <code>novelty=True</code> برای Predict روی Sampleهای جدید است.</p></div></details>
+      </section>
+
+      <section class="section" id="validate" data-related="evaluate,model,deliver" data-search="validation train test time series split gridsearchcv randomized search learning curve validation curve overfit cv gap">
+        <div class="section-head"><div><span class="badge">هستهٔ جلسه + توسعه</span><h2>۴. اعتبارسنجی و Tune؛ آینده را لو نده</h2></div></div>
+        <div class="tabs" data-tabs>
+          <div class="tab-list" role="tablist" aria-label="مقایسه تقسیم داده">
+            <button class="tab" role="tab" id="split-tab-random" aria-controls="split-panel-random" aria-selected="true">دادهٔ معمولی</button>
+            <button class="tab" role="tab" id="split-tab-time" aria-controls="split-panel-time" aria-selected="false" tabindex="-1">Time Series</button>
+          </div>
+          <div class="tab-panel" role="tabpanel" id="split-panel-random" aria-labelledby="split-tab-random"><p>برای Classification از Stratification استفاده کن. اگر Group داری، Sampleهای یک Group نباید هم‌زمان در train و validation پخش شوند.</p></div>
+          <div class="tab-panel" role="tabpanel" id="split-panel-time" aria-labelledby="split-tab-time" hidden><p>Shuffle نکن. Hold-out انتهایی برای test نهایی و <code>TimeSeriesSplit</code> برای Tune. پارامترهای مهم: <code>n_splits</code>، <code>test_size</code>، <code>max_train_size</code> و <code>gap</code>.</p></div>
+        </div>
+        <div class="diagram" role="img" aria-label="تقسیم زمانی واکنش گرا"><div class="diagram-head">Walk-forward به زبان ساده</div><div class="diagram-grid"><div class="diagram-node" data-tone="brand">Train گذشته</div><div class="diagram-arrow">←</div><div class="diagram-node">Gap اختیاری</div><div class="diagram-arrow">←</div><div class="diagram-node" data-tone="accent">Validation آینده</div></div></div>
+        <details class="disclosure" open><summary>GridSearchCV در حد لازم</summary><div class="disclosure-body"><p>تمام Combinationهای یک Grid را با CV می‌سنجد. مهم‌ترین ورودی‌ها: <code>param_grid</code>، <code>scoring</code>، <code>cv</code>، <code>n_jobs</code> و <code>refit</code>. پارامتر Pipeline با الگوی <code>step__parameter</code> نوشته می‌شود.</p>
+          <figure class="code-block" data-code><figcaption class="code-head"><span class="code-file">search.py</span><span class="code-language">Python</span><button class="copy-code" type="button">Copy</button></figcaption><pre><code><span class="line" data-line="1">grid = {</span><span class="line hl" data-line="2">    "poly__degree": [2, 3, 5, 8],</span><span class="line hl" data-line="3">    "model__alpha": [0.01, 0.1, 1, 10, 100],</span><span class="line" data-line="4">}</span><span class="line" data-line="5">search = GridSearchCV(</span><span class="line hl" data-line="6">    pipe, grid, scoring="neg_root_mean_squared_error",</span><span class="line hl" data-line="7">    cv=TimeSeriesSplit(n_splits=5, gap=2), refit=True</span><span class="line" data-line="8">)</span></code></pre></figure>
+        </div></details>
+        <details class="disclosure"><summary>Learning Curve و Validation Curve را چطور بخوانیم؟</summary><div class="disclosure-body"><div class="metric-grid"><article class="metric"><div class="metric-name">هر دو Score ضعیف و نزدیک</div><div class="metric-question">Underfit محتمل</div><small>Feature بهتر یا Model منعطف‌تر لازم است.</small></article><article class="metric"><div class="metric-name">Train خوب، Validation ضعیف</div><div class="metric-question">Overfit محتمل</div><small>Regularization، Data بیشتر یا Complexity کمتر.</small></article><article class="metric"><div class="metric-name">Validation ناپایدار</div><div class="metric-question">Split/Data مشکل دارد</div><small>Variance، Drift، Group یا Leakage را بررسی کن.</small></article></div></div></details>
+        <div class="note" data-tone="danger"><strong>test مستقل:</strong> بعد از انتخاب Hyperparameter فقط یک بار برای گزارش نهایی استفاده شود؛ انتخاب‌های مکرر بر اساس test آن را آلوده می‌کند.</div>
+      </section>
+
+      <section class="section" id="deliver" data-related="validate,prepare,sources" data-search="model persistence pickle joblib cloudpickle skops onnx security deployment metadata save load">
+        <div class="section-head"><div><span class="badge">هستهٔ جلسه + توسعه</span><h2>۵. تحویل مدل؛ Artifact فقط یک فایل نیست</h2></div></div>
+        <p>Pipeline کامل را ذخیره کن تا Imputer، Scaler، Feature Engineering و Model با هم بمانند. کنار Artifact هم Recipe آموزش و Versionها را نگه دار.</p>
+        <div class="tabs" data-tabs>
+          <div class="tab-list" role="tablist" aria-label="روش ذخیره مدل">
+            <button class="tab" role="tab" id="persist-tab-pickle" aria-controls="persist-panel-pickle" aria-selected="true">pickle / joblib</button>
+            <button class="tab" role="tab" id="persist-tab-skops" aria-controls="persist-panel-skops" aria-selected="false" tabindex="-1">skops.io</button>
+            <button class="tab" role="tab" id="persist-tab-onnx" aria-controls="persist-panel-onnx" aria-selected="false" tabindex="-1">ONNX</button>
+          </div>
+          <div class="tab-panel" role="tabpanel" id="persist-panel-pickle" aria-labelledby="persist-tab-pickle"><strong>ساده و Python-native.</strong> joblib برای Arrayهای بزرگ و Memory mapping بهتر است؛ هر دو می‌توانند هنگام Load کد اجرا کنند و فقط برای منبع Trusted هستند.</div>
+          <div class="tab-panel" role="tabpanel" id="persist-panel-skops" aria-labelledby="persist-tab-skops" hidden><strong>امن‌تر از فرمت‌های Pickle-based.</strong> Typeهای ناشناخته قبل از Load قابل بررسی‌اند، ولی پوشش Typeها محدودتر است و Environment مشابه لازم می‌ماند.</div>
+          <div class="tab-panel" role="tabpanel" id="persist-panel-onnx" aria-labelledby="persist-tab-onnx" hidden><strong>برای Inference مستقل از Python.</strong> Runtime سبک‌تر، اما همهٔ Modelها و Componentهای سفارشی قابل تبدیل نیستند.</div>
+        </div>
+        <div class="metric-grid"><article class="metric"><div class="metric-name">Environment</div><div class="metric-question">با چه Versionهایی ساخته شد؟</div><small>Python، sklearn، NumPy و SciPy را Pin کن.</small></article><article class="metric"><div class="metric-name">Data contract</div><div class="metric-question">ورودی دقیقاً چه Schemaیی دارد؟</div><small>نام، ترتیب، Type و Unit Featureها.</small></article><article class="metric"><div class="metric-name">Evidence</div><div class="metric-question">چرا این Model انتخاب شد؟</div><small>CV result، test metric، محدودیت‌ها و تاریخ آموزش.</small></article></div>
+        <details class="disclosure"><summary>Checklist قبل از GitHub/Release</summary><div class="disclosure-body"><ul><li>Notebook با Restart &amp; Run All اجرا می‌شود.</li><li>هیچ Preprocessing بیرون Pipeline روی کل Data Fit نشده است.</li><li>README، Dependency version و Data schema ثبت شده‌اند.</li><li>Artifact ناشناس Load نمی‌شود و فایل حساس Commit نشده است.</li><li>Metric نهایی، Baseline و محدودیت‌ها نوشته شده‌اند.</li></ul></div></details>
+      </section>
+
+      <section class="section" id="vault" data-related="prepare,model,validate" data-search="parameter vault hyperparameter reference standardscaler minmax simpleimputer knnimputer polynomial ridge lasso gridsearch">
+        <div class="section-head"><div><span class="badge extra">فقط هنگام نیاز</span><h2>Parameter Vault؛ مرجع فشرده، نه متن اجباری</h2></div></div>
+        <p>این بخش برای Lookup است. لازم نیست آن را خطی بخوانی؛ با Search نام ابزار یا Parameter را پیدا کن.</p>
+        <details class="disclosure"><summary>Scalerها</summary><div class="disclosure-body"><div class="table-shell"><table><thead><tr><th>ابزار</th><th>Parameterها</th><th>نکته</th></tr></thead><tbody><tr><td>StandardScaler</td><td><code>copy, with_mean, with_std</code></td><td>Sparse + centering سازگار نیست؛ <code>with_mean=False</code>.</td></tr><tr><td>MinMaxScaler</td><td><code>feature_range, copy, clip</code></td><td>clip جلوی Drift را نمی‌گیرد.</td></tr><tr><td>RobustScaler</td><td><code>with_centering, with_scaling, quantile_range, unit_variance</code></td><td>برای Outlier مناسب‌تر.</td></tr></tbody></table></div></div></details>
+        <details class="disclosure"><summary>Imputerها</summary><div class="disclosure-body"><div class="table-shell"><table><thead><tr><th>ابزار</th><th>Parameterها</th><th>نکته</th></tr></thead><tbody><tr><td>SimpleImputer</td><td><code>missing_values, strategy, fill_value, copy, add_indicator, keep_empty_features</code></td><td>قابل توضیح و Baseline خوب.</td></tr><tr><td>KNNImputer</td><td><code>missing_values, n_neighbors, weights, metric, copy, add_indicator, keep_empty_features</code></td><td>Distance و Scaling تعیین‌کننده‌اند.</td></tr><tr><td>MissingIndicator</td><td><code>missing_values, features, sparse, error_on_new</code></td><td>فقط علامت می‌سازد.</td></tr></tbody></table></div></div></details>
+        <details class="disclosure"><summary>Polynomial و Linear Modelها</summary><div class="disclosure-body"><div class="table-shell"><table><thead><tr><th>ابزار</th><th>Parameterها</th><th>اول کدام را Tune کنم؟</th></tr></thead><tbody><tr><td>PolynomialFeatures</td><td><code>degree, interaction_only, include_bias, order</code></td><td>degree و interaction_only</td></tr><tr><td>LinearRegression</td><td><code>fit_intercept, copy_X, tol, n_jobs, positive</code></td><td>معمولاً Tune زیادی ندارد.</td></tr><tr><td>Ridge</td><td><code>alpha, fit_intercept, copy_X, max_iter, tol, solver, positive, random_state</code></td><td>alpha؛ بعد Solver/Convergence</td></tr><tr><td>Lasso</td><td><code>alpha, fit_intercept, precompute, copy_X, max_iter, tol, warm_start, positive, random_state, selection</code></td><td>alpha؛ بعد Convergence</td></tr></tbody></table></div></div></details>
+        <details class="disclosure"><summary>GridSearchCV و TimeSeriesSplit</summary><div class="disclosure-body"><div class="table-shell"><table><thead><tr><th>ابزار</th><th>Parameterها</th><th>دام</th></tr></thead><tbody><tr><td>GridSearchCV</td><td><code>estimator, param_grid, scoring, n_jobs, refit, cv, verbose, pre_dispatch, error_score, return_train_score</code></td><td>Grid بزرگ Explosion محاسباتی می‌سازد؛ RandomizedSearch را در نظر بگیر.</td></tr><tr><td>TimeSeriesSplit</td><td><code>n_splits, max_train_size, test_size, gap</code></td><td>فرض می‌کند ترتیب Sampleها معنی زمانی دارد.</td></tr></tbody></table></div></div></details>
+      </section>
+
+      <section class="section" id="quiz" data-related="evaluate,prepare,model" data-search="quiz self assessment سوال precision recall leakage degree r2">
+        <div class="section-head"><h2>خودآزمایی سریع</h2></div>
+        <div class="quiz"><details><summary>چرا Accuracy=99% ممکن است Model بدی باشد؟</summary><p>اگر Positive بسیار نادر باشد، Model می‌تواند همه را Negative بگوید و Accuracy بالا بگیرد، ولی Recall Positive صفر باشد.</p></details><details><summary>فرق fit_transform روی train و transform روی test چیست؟</summary><p>train پارامترهای Transformer را یاد می‌دهد؛ test فقط با همان پارامترهای یادگرفته‌شده تبدیل می‌شود.</p></details><details><summary>چرا degree=8 با R² منفی هنوز خوب نیست؟</summary><p>فقط بین Candidateها بهتر بوده؛ R² منفی یعنی Baseline پیش‌بینی Mean روی test بهتر عمل کرده است.</p></details><details><summary>چه زمانی Ridge را به LinearRegression ترجیح می‌دهیم؟</summary><p>وقتی Featureها زیاد یا هم‌بسته‌اند، به‌خصوص بعد از PolynomialFeatures، و می‌خواهیم با L2 Coefficientها را پایدارتر کنیم.</p></details></div>
+      </section>
+
+      <section class="section" id="sources" data-related="deliver,vault" data-search="sources documentation sklearn official version">
+        <div class="section-head"><h2>منابع رسمی و محدودهٔ سند</h2></div>
+        <p>هستهٔ محتوا از ویدئوها و نوت‌بوک‌های جلسهٔ چهارم آمده است. بخش‌های تکمیلی با مستندات رسمی scikit-learn stable 1.9.0 در تاریخ ۱۷ مرداد ۱۴۰۵ تطبیق داده شده‌اند.</p>
+        <div class="metric-grid"><article class="metric"><div class="metric-name"><a href="https://scikit-learn.org/stable/modules/model_evaluation.html">Metrics &amp; scoring</a></div><small>Regression، Classification و Scoring API.</small></article><article class="metric"><div class="metric-name"><a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html">Pipeline</a></div><small>Stepها، nested parameters و Caching.</small></article><article class="metric"><div class="metric-name"><a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html">GridSearchCV</a></div><small>Search، scoring، cv و refit.</small></article><article class="metric"><div class="metric-name"><a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.PolynomialFeatures.html">PolynomialFeatures</a></div><small>degree، interaction و رشد Featureها.</small></article><article class="metric"><div class="metric-name"><a href="https://scikit-learn.org/stable/modules/linear_model.html">Linear models</a></div><small>LinearRegression، Ridge و Lasso.</small></article><article class="metric"><div class="metric-name"><a href="https://scikit-learn.org/stable/model_persistence.html">Model persistence</a></div><small>pickle، joblib، skops و ONNX.</small></article></div>
+        <div class="note" data-tone="success"><strong>Version note:</strong> قبل از استفاده، نسخهٔ نصب‌شده را با <code>sklearn.__version__</code> بررسی کن؛ APIها در نسخه‌های آینده ممکن است تغییر کنند.</div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="search-dialog" aria-labelledby="search-title">
+    <div class="search-box"><label id="search-title" for="search-input">جستجو</label><input class="search-input" id="search-input" type="search" autocomplete="off" placeholder="مثلاً Ridge، Recall یا fit_transform"><button class="close-search" id="close-search" type="button" aria-label="بستن جستجو">Esc</button></div>
+    <ul class="search-results" id="search-results" aria-live="polite"></ul>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (()=>{
+      "use strict";
+      const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+      const root=document.documentElement, body=document.body, sidebar=$("#sidebar"), overlay=$("#drawer-overlay"), menu=$("#menu-button"), toast=$("#toast");
+      const showToast=(text)=>{toast.textContent=text;toast.classList.add("show");clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove("show"),1700)};
+
+      // Theme contract: stored choice > OS preference.
+      const storedTheme=localStorage.getItem("ml-doc-theme");
+      const preferred=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";
+      const setTheme=(theme)=>{root.dataset.theme=theme;$("#theme-toggle").setAttribute("aria-label",theme==="dark"?"فعال‌کردن پوستهٔ روشن":"فعال‌کردن پوستهٔ تیره")};
+      setTheme(storedTheme||preferred);
+      $("#theme-toggle").addEventListener("click",()=>{const next=root.dataset.theme==="dark"?"light":"dark";setTheme(next);localStorage.setItem("ml-doc-theme",next);showToast(next==="dark"?"پوستهٔ تیره فعال شد":"پوستهٔ روشن فعال شد")});
+
+      // Drawer contract.
+      const setDrawer=(open)=>{sidebar.classList.toggle("open",open);overlay.classList.toggle("show",open);body.classList.toggle("drawer-open",open);menu.setAttribute("aria-expanded",String(open));if(open) sidebar.focus?.()};
+      menu.addEventListener("click",()=>setDrawer(!sidebar.classList.contains("open")));overlay.addEventListener("click",()=>setDrawer(false));
+      $$(".toc-link").forEach(a=>a.addEventListener("click",()=>setDrawer(false)));
+      addEventListener("keydown",e=>{if(e.key==="Escape"&&sidebar.classList.contains("open"))setDrawer(false)});
+
+      // Accessible tabs contract with arrow-key navigation.
+      $$('[data-tabs]').forEach(group=>{const tabs=$$('[role="tab"]',group),panels=$$('[role="tabpanel"]',group);const activate=(tab)=>{tabs.forEach(t=>{const on=t===tab;t.setAttribute("aria-selected",String(on));t.tabIndex=on?0:-1});panels.forEach(p=>p.hidden=p.id!==tab.getAttribute("aria-controls"));tab.focus()};tabs.forEach((tab,i)=>{tab.addEventListener("click",()=>activate(tab));tab.addEventListener("keydown",e=>{if(!["ArrowLeft","ArrowRight","Home","End"].includes(e.key))return;e.preventDefault();let n=i;if(e.key==="ArrowLeft")n=(i+1)%tabs.length;if(e.key==="ArrowRight")n=(i-1+tabs.length)%tabs.length;if(e.key==="Home")n=0;if(e.key==="End")n=tabs.length-1;activate(tabs[n])})})});
+
+      // Code component contract.
+      $$("[data-code]").forEach(block=>{$(".copy-code",block).addEventListener("click",async()=>{const text=$$(".line",block).map(x=>x.textContent).join("\n");try{await navigator.clipboard.writeText(text);showToast("کد کپی شد")}catch{showToast("کپی در این مرورگر ممکن نیست")}})});
+
+      // Permalinks and section navigation are generated to stay AI-maintainable.
+      const sections=$$("main section[id]");
+      sections.forEach((section,index)=>{const heading=$("h1,h2",section);if(!heading)return;const head=heading.closest(".section-head");if(head){const b=document.createElement("button");b.className="permalink";b.type="button";b.setAttribute("aria-label","کپی لینک این بخش");b.title="کپی لینک";b.textContent="#";b.addEventListener("click",async()=>{const url=location.href.split("#")[0]+"#"+section.id;try{await navigator.clipboard.writeText(url);showToast("لینک بخش کپی شد")}catch{location.hash=section.id}});head.append(b)}
+        if(section.classList.contains("hero"))return;const nav=document.createElement("nav");nav.className="section-nav";nav.setAttribute("aria-label","پیمایش بین بخش‌ها");const prev=sections[index-1],next=sections[index+1];nav.innerHTML=`${prev?`<a href="#${prev.id}">→ ${$("h1,h2",prev)?.textContent||"قبلی"}</a>`:"<span></span>"}<span class="related"></span>${next?`<a class="next" href="#${next.id}">${$("h1,h2",next)?.textContent||"بعدی"} ←</a>`:"<span></span>"}`;const rel=$(".related",nav);(section.dataset.related||"").split(",").filter(Boolean).forEach(id=>{const target=document.getElementById(id);if(target){const a=document.createElement("a");a.href="#"+id;a.textContent=$("h2",target)?.textContent?.split("؛")[0]||id;rel.append(a)}});section.append(nav)
+      });
+
+      // Scroll spy contract.
+      const toc=new Map($$(".toc-link").map(a=>[a.getAttribute("href").slice(1),a]));
+      const spy=new IntersectionObserver(entries=>{const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top)[0];if(!visible)return;toc.forEach(a=>a.removeAttribute("aria-current"));const active=toc.get(visible.target.id);if(active){active.setAttribute("aria-current","true");active.closest("details")?.setAttribute("open","")}}, {rootMargin:"-18% 0px -68% 0px",threshold:0});
+      sections.forEach(s=>spy.observe(s));
+
+      // Global search indexes sections, headings, terms and code without external dependencies.
+      const dialog=$("#search-dialog"),input=$("#search-input"),results=$("#search-results");
+      const normalize=s=>(s||"").toLocaleLowerCase("fa").replace(/[ي]/g,"ی").replace(/[ك]/g,"ک").replace(/\s+/g," ").trim();
+      const index=sections.map(s=>{const title=$("h1,h2",s)?.textContent||s.id;const raw=[title,s.dataset.search||"",...$$("h3,.metric-name,.metric-question,code",s).map(x=>x.textContent)].join(" ");return{id:s.id,title,text:normalize(raw)}});
+      const render=(q)=>{const n=normalize(q);const found=(n?index.filter(x=>x.text.includes(n)):index.slice(0,8)).slice(0,12);results.innerHTML="";if(!found.length){results.innerHTML='<li class="search-empty">نتیجه‌ای پیدا نشد. نام ابزار یا مفهوم را کوتاه‌تر بنویس.</li>';return}found.forEach(item=>{const li=document.createElement("li"),a=document.createElement("a");a.href="#"+item.id;a.innerHTML=`<span class="result-title">${item.title}</span><span class="result-snippet">رفتن مستقیم به این بخش</span>`;a.addEventListener("click",()=>dialog.close());li.append(a);results.append(li)})};
+      const openSearch=()=>{if(!dialog.open)dialog.showModal();render(input.value);setTimeout(()=>input.focus(),0)};
+      $("#search-trigger").addEventListener("click",openSearch);$$('[data-open-search]').forEach(b=>b.addEventListener("click",openSearch));$("#close-search").addEventListener("click",()=>dialog.close());input.addEventListener("input",()=>render(input.value));
+      addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();openSearch()}});
+    })();
+  </script>
+</body>
+</html>

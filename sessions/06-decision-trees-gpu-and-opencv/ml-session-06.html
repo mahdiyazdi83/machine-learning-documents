@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="fa" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>یادگیری ماشین — جلسهٔ ۶ | Decision Tree، GPU و OpenCV</title>
+  <meta name="description" content="مستند فارسی و توضیحی جلسهٔ ششم یادگیری ماشین: Decision Tree، Gini و Entropy، Iris، RAPIDS، cuML و OpenCV">
+  <style>
+:root{color-scheme:dark;--bg:#07101f;--surface:#101c31;--surface-2:#172640;--surface-3:#1c2f4e;--line:#2b4365;--text:#d6e2f2;--heading:#fff;--muted:#9fb0c6;--brand:#52d6ee;--brand-strong:#22aeca;--amber:#f7c95c;--ok:#79e6a3;--danger:#ff9cad;--violet:#c9b7ff;--focus:#ffe16b;--overlay:rgba(2,7,18,.76);--shadow:0 18px 46px rgba(0,0,0,.28);--radius:1rem;--radius-sm:.65rem;--content:960px;--side:292px}
+html[data-theme="light"]{color-scheme:light;--bg:#eef4fb;--surface:#fff;--surface-2:#edf4fb;--surface-3:#e2edf8;--line:#bfd0e3;--text:#26374b;--heading:#0c1c31;--muted:#597087;--brand:#087f9b;--brand-strong:#066a83;--amber:#9b6100;--ok:#17643a;--danger:#a91e3a;--violet:#6b42b8;--focus:#8a5a00;--overlay:rgba(12,28,49,.5);--shadow:0 15px 36px rgba(35,65,95,.12)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:5.5rem}body{margin:0;background:linear-gradient(145deg,var(--bg),color-mix(in srgb,var(--bg) 86%,var(--brand)));color:var(--text);font-family:Vazirmatn,Vazir,Tahoma,Arial,sans-serif;line-height:1.95}body.drawer-open{overflow:hidden}a{color:inherit}button,input{font:inherit}button{cursor:pointer}h1,h2,h3,h4,strong{color:var(--heading)}code,bdi,.ltr,pre{direction:ltr;unicode-bidi:isolate}code{background:var(--surface-3);color:var(--brand);padding:.1rem .4rem;border-radius:.38rem;font:inherit;font-size:.9em}:focus-visible{outline:3px solid var(--focus);outline-offset:3px}.skip-link{position:fixed;z-index:120;top:.5rem;right:.5rem;transform:translateY(-160%);padding:.55rem .9rem;border-radius:var(--radius-sm);background:var(--heading);color:var(--bg)}.skip-link:focus{transform:none}
+.appbar{position:sticky;top:0;z-index:50;height:4.25rem;display:flex;align-items:center;gap:.65rem;padding:.65rem max(1rem,calc((100vw - 1400px)/2));background:color-mix(in srgb,var(--bg) 88%,transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.brand{margin-inline-end:auto;color:var(--heading);font-weight:900}.icon-btn,.search-trigger{min-height:2.7rem;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);padding:.45rem .75rem}.menu-btn{display:none}.search-trigger{display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-width:235px}.shortcut{border:1px solid var(--line);border-bottom-width:2px;border-radius:.35rem;padding:.05rem .42rem;color:var(--muted);font-size:.76rem}
+.layout{max-width:1400px;margin:auto;display:grid;grid-template-columns:var(--side) minmax(0,var(--content));gap:2rem;padding:2rem}.sidebar{position:sticky;top:5.55rem;align-self:start;max-height:calc(100vh - 7rem);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow)}.side-title{font-weight:950;color:var(--heading);padding:.25rem .65rem .7rem}.nav-group{border-top:1px solid var(--line);padding:.35rem 0}.nav-group summary{cursor:pointer;color:var(--heading);font-weight:850;padding:.4rem .65rem;border-radius:var(--radius-sm)}.nav-group summary:hover{background:var(--surface-2)}.toc{display:block;text-decoration:none;color:var(--muted);padding:.34rem .7rem;border-radius:.5rem;font-size:.82rem;line-height:1.55;border-right:3px solid transparent}.toc:hover{background:var(--surface-2);color:var(--brand)}.toc[aria-current="true"]{background:color-mix(in srgb,var(--brand) 15%,transparent);color:var(--brand);border-right-color:var(--brand);font-weight:900}.source-note{border-top:1px solid var(--line);margin-top:.7rem;padding:.85rem .65rem 0;color:var(--muted);font-size:.73rem}
+main{min-width:0;display:flex;flex-direction:column;gap:1.5rem;padding-bottom:6rem}.hero,.section{border:1px solid var(--line);box-shadow:var(--shadow)}.hero{position:relative;overflow:hidden;border-radius:1.45rem;padding:4.3rem 3rem;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--brand) 24%,transparent),transparent 35%),radial-gradient(circle at 92% 100%,color-mix(in srgb,var(--amber) 15%,transparent),transparent 34%),var(--surface)}.eyebrow,.chip{display:inline-flex;border:1px solid color-mix(in srgb,var(--brand) 55%,var(--line));background:color-mix(in srgb,var(--brand) 13%,transparent);color:var(--brand);border-radius:999px;padding:.2rem .72rem;font-size:.8rem;font-weight:850}.hero h1{font-size:clamp(2.2rem,5vw,4rem);line-height:1.42;margin:1.2rem 0 .7rem;max-width:830px}.hero p{font-size:1.06rem;max-width:800px;color:var(--muted)}.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.5rem}.section{background:var(--surface);border-radius:var(--radius);padding:2rem}.section p{margin:.4rem 0 1.1rem}.section-title{font-size:clamp(1.4rem,3vw,1.95rem);font-weight:950;margin:0}.section-heading,.sub-heading{display:flex;align-items:flex-start;gap:.55rem;border-bottom:1px solid var(--line);padding-bottom:.8rem;margin:0 0 1.2rem}.sub-heading{margin-top:1.7rem}.sub{color:var(--brand);font-size:1.18rem;margin:0}.permalink{flex:0 0 auto;border:0;background:transparent;color:var(--muted);border-radius:.35rem;padding:.12rem .38rem}.permalink:hover{background:var(--surface-2);color:var(--brand)}
+.grid2,.grid3,.grid4{display:grid;gap:1rem}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid4{grid-template-columns:repeat(4,minmax(0,1fr))}.mini,.record{border:1px solid var(--line);background:var(--surface-2);border-radius:.8rem;padding:1rem;transition:transform .16s,border-color .16s}.mini:hover,.record:hover{transform:translateY(-2px);border-color:var(--brand)}.mini p,.record p{margin:.3rem 0 0}.note{border-right:4px solid;padding:1rem 1.15rem;border-radius:.72rem;margin:1.2rem 0}.info{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 15%,var(--surface));color:var(--text)}.warn{border-color:var(--amber);background:color-mix(in srgb,var(--amber) 15%,var(--surface));color:var(--text)}.danger{border-color:var(--danger);background:color-mix(in srgb,var(--danger) 14%,var(--surface));color:var(--text)}.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--surface));color:var(--text)}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:.8rem;margin:1.2rem 0}table{width:100%;min-width:660px;border-collapse:collapse;text-align:right;font-size:.9rem}th{background:var(--surface-3);color:var(--heading)}th,td{padding:.72rem .85rem;border-bottom:1px solid var(--line);vertical-align:top}tr:nth-child(even) td{background:color-mix(in srgb,var(--surface-2) 60%,transparent)}.table-disclosure,.code-disclosure{border:1px solid var(--line);border-radius:.8rem;margin:.85rem 0;background:var(--surface-2);overflow:hidden}.table-disclosure>summary,.code-disclosure>summary{cursor:pointer;padding:.8rem 1rem;color:var(--heading);font-weight:850}.table-disclosure[open]>summary,.code-disclosure[open]>summary{border-bottom:1px solid var(--line)}.code-disclosure>summary:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--focus);border-radius:.55rem}.table-disclosure>.table-wrap{margin:0;border-inline:0;border-bottom:0;border-radius:0}.code-disclosure>.code-block{margin:1rem}
+.code-block{margin:1rem 0;border:1px solid var(--line);border-radius:.82rem;overflow:hidden;background:#020617;color:#e2e8f0;direction:ltr;box-shadow:0 10px 28px rgba(0,0,0,.16)}.code-head{display:flex;align-items:center;gap:.6rem;padding:.48rem .7rem;background:#111827;border-bottom:1px solid #334155;color:#94a3b8;font:600 .78rem/1.5 Consolas,monospace}.code-file{color:#e2e8f0;font-weight:700}.code-language{margin-left:auto;color:#67e8f9}.copy-code{border:1px solid #334155;background:#172033;color:#e2e8f0;border-radius:.4rem;padding:.25rem .55rem}.copy-code:hover{border-color:#67e8f9;color:#67e8f9}.code-block pre{margin:0;border:0;border-radius:0;padding:.9rem 0;overflow:auto;background:#020617;color:#e2e8f0;line-height:1.65;tab-size:4}.code-block code{display:block;background:none;padding:0;color:inherit;font:400 .82rem/1.65 Consolas,monospace}.line{display:block;padding:0 1rem;white-space:pre}.line::before{content:attr(data-line);display:inline-block;width:2.1rem;margin-right:.8rem;color:#475569;text-align:right;user-select:none}.line.hl{background:rgba(251,191,36,.1);border-left:3px solid #fbbf24}.equation{direction:ltr;unicode-bidi:isolate;overflow:auto;text-align:center;font:700 .94rem/1.85 Consolas,monospace;color:var(--brand);background:var(--surface-2);border:1px solid var(--line);border-radius:.75rem;padding:1rem;margin:1.2rem 0}
+.flow{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:.42rem;align-items:center;margin:1.2rem 0}.flow .box{text-align:center;padding:.8rem;border:1px solid color-mix(in srgb,var(--brand) 55%,var(--line));background:color-mix(in srgb,var(--brand) 10%,var(--surface));border-radius:.65rem;color:var(--brand);font-weight:850}.flow .arrow{text-align:center;color:var(--brand)}.diagram{direction:ltr;unicode-bidi:isolate;background:color-mix(in srgb,var(--bg) 82%,black);border:1px solid var(--line);border-radius:1rem;padding:1.15rem;margin:1.25rem 0;overflow:hidden}.diagram-title{direction:rtl;text-align:right;color:var(--heading);font-weight:900;margin-bottom:.75rem}.diagram small{direction:rtl;display:block;color:var(--muted);text-align:center;margin-top:.55rem}.diagram svg{display:block;width:100%;height:auto;max-height:420px}.diagram text{font-family:Tahoma,Arial,sans-serif}.cm{direction:ltr;display:grid;grid-template-columns:90px repeat(2,minmax(110px,1fr));grid-template-rows:55px repeat(2,110px);gap:.55rem;max-width:620px;margin:1.3rem auto}.cm>div{display:grid;place-items:center;text-align:center;border-radius:.65rem;padding:.45rem}.cm .head{background:var(--surface-3);color:var(--text);font-weight:800}.cm .tp,.cm .tn{background:#064e3b;border:2px solid #34d399;color:#d1fae5}.cm .fp,.cm .fn{background:#4c0519;border:2px solid #fb7185;color:#ffe4e6}.cm b{font-size:1.45rem}.bars{display:flex;align-items:flex-end;justify-content:center;gap:3rem;height:230px;padding:1rem}.bar{width:110px;border-radius:.7rem .7rem 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:.5rem;font-weight:900;color:#07101d}.bar.big{height:185px;background:var(--brand)}.bar.small{height:48px;background:var(--amber)}
+.quiz details{border:1px solid var(--line);border-radius:.72rem;margin:.7rem 0;background:var(--surface-2)}.quiz summary{cursor:pointer;color:var(--heading);font-weight:850;padding:.8rem 1rem}.quiz details p{padding:0 1rem .8rem;margin:0}.section-nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:.55rem;border-top:1px solid var(--line);margin-top:1.6rem;padding-top:1rem;font-size:.78rem}.section-nav a{text-decoration:none;color:var(--muted);padding:.34rem .55rem;border-radius:.45rem}.section-nav a:hover{color:var(--brand);background:var(--surface-2)}.section-nav .next{text-align:left}.related{display:flex;gap:.3rem;flex-wrap:wrap;justify-content:center}.back{position:fixed;left:1.1rem;bottom:1.1rem;width:2.7rem;height:2.7rem;border-radius:50%;display:grid;place-items:center;text-decoration:none;background:var(--brand-strong);color:white;box-shadow:var(--shadow);font-size:1.2rem}
+.overlay{display:none;position:fixed;inset:0;z-index:60;background:var(--overlay);border:0;width:100%;height:100%}dialog{width:min(720px,calc(100% - 2rem));max-height:min(720px,calc(100vh - 2rem));padding:0;border:1px solid var(--line);border-radius:1rem;background:var(--surface);color:var(--text);box-shadow:var(--shadow)}dialog::backdrop{background:var(--overlay)}.search-box{display:flex;align-items:center;gap:.5rem;padding:.75rem;border-bottom:1px solid var(--line)}.search-input{flex:1;border:0;background:transparent;color:var(--heading);font-size:1.03rem;outline:0}.close-search{border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:.5rem;padding:.35rem .55rem}.search-results{list-style:none;margin:0;padding:.55rem;max-height:560px;overflow:auto}.search-results a{display:block;text-decoration:none;border-radius:.55rem;padding:.7rem}.search-results a:hover,.search-results a:focus{background:var(--surface-2)}.result-title{display:block;color:var(--heading);font-weight:900}.result-snippet{display:block;color:var(--muted);font-size:.8rem}.search-empty{padding:1rem;color:var(--muted)}.toast{position:fixed;z-index:120;left:1rem;bottom:1rem;background:var(--heading);color:var(--bg);padding:.55rem .8rem;border-radius:.6rem;box-shadow:var(--shadow);opacity:0;transform:translateY(1rem);pointer-events:none;transition:.18s}.toast.show{opacity:1;transform:none}
+@media(max-width:1050px){.appbar{padding-inline:1rem}.menu-btn{display:inline-flex}.search-trigger{min-width:0}.search-label{display:none}.layout{display:block;padding:1rem}.sidebar{position:fixed;z-index:70;top:0;right:0;height:100dvh;max-height:none;width:min(86vw,340px);border-radius:0;border-block:0;transform:translateX(105%);transition:transform .22s}.sidebar.open{transform:none}.overlay.show{display:block}.hero{padding:3rem 1.5rem}.section{padding:1.35rem}.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){.grid2,.grid3,.grid4{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.flow .arrow{transform:rotate(90deg)}.hero h1{font-size:2.05rem}.diagram{padding:.7rem}.diagram svg{min-width:0!important;width:100%;height:auto}.cm{grid-template-columns:68px repeat(2,minmax(0,1fr));grid-template-rows:48px repeat(2,95px);font-size:.77rem}.bars{gap:1.2rem}.bar{width:90px}.section-nav{grid-template-columns:1fr 1fr}.related{grid-column:1/-1;grid-row:2}.search-trigger{padding-inline:.55rem}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}@media print{.appbar,.sidebar,.overlay,.back,.section-nav,.permalink,.toast{display:none!important}.layout{display:block;max-width:none;padding:0}.hero,.section{box-shadow:none;background:white;border-color:#cbd5e1;break-inside:avoid}.table-disclosure>.table-wrap,.code-disclosure>.code-block{display:block}.table-disclosure>summary,.code-disclosure>summary{display:none}.diagram{background:white}.diagram text{fill:#172033!important}}
+
+.tabs{border:1px solid var(--line);border-radius:.85rem;background:var(--surface-2);overflow:hidden;margin:1.2rem 0}
+.tabs [role="tablist"]{display:flex;gap:.35rem;flex-wrap:wrap;padding:.55rem;border-bottom:1px solid var(--line)}
+.tabs [role="tab"]{border:1px solid transparent;border-radius:.55rem;background:transparent;color:var(--muted);padding:.5rem .8rem;font-weight:850}
+.tabs [role="tab"]:hover{background:var(--surface-3);color:var(--heading)}
+.tabs [role="tab"][aria-selected="true"]{border-color:color-mix(in srgb,var(--brand) 55%,var(--line));background:color-mix(in srgb,var(--brand) 14%,var(--surface));color:var(--brand)}
+.tabs [role="tabpanel"]{padding:1rem 1.15rem}.tabs [role="tabpanel"] p:last-child{margin-bottom:0}
+@media(max-width:680px){.tabs [role="tablist"]{display:grid;grid-template-columns:1fr}.tabs [role="tab"]{width:100%}}
+/* Responsive geometry correction: shared cards, flows and bar diagrams */
+.grid2,.grid3,.grid4,.mini,.record,.metric,.flow .box{min-width:0}
+.mini,.record,.metric,.flow .box{overflow-wrap:anywhere}
+.diagram .grid2,.diagram .grid3,.diagram .grid4{direction:rtl;unicode-bidi:normal}
+.flow{display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;gap:.5rem}
+.flow .box{flex:1 1 0;max-width:none}
+.flow .arrow{flex:0 0 auto}
+.bars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:1rem;height:230px;padding:1rem}
+.bar{width:100%;min-width:0;line-height:1.35;text-align:center;padding:.65rem .3rem;overflow-wrap:anywhere}
+.bar.small{height:92px}.bar.big{height:185px}
+@media(max-width:900px){
+  .flow{flex-direction:column;align-items:stretch;gap:.45rem}
+  .flow .box{flex:0 0 auto;max-width:none;width:100%}
+  .flow .arrow{transform:rotate(90deg);align-self:center;line-height:1}
+}
+@media(max-width:680px){
+  .bars{gap:.55rem;height:210px;padding:.65rem .2rem}
+  .bar{width:100%;font-size:.74rem;padding:.55rem .15rem}
+  .bar.small{height:96px}.bar.big{height:175px}
+}
+
+
+/* Session 06 reusable learning visuals */
+.tree-wide{display:block}.tree-mobile{display:none}.tree-node{fill:var(--surface-2);stroke:var(--brand);stroke-width:2}.tree-node.root{stroke:var(--amber);stroke-width:3}.tree-node.leaf-ok{stroke:var(--ok)}.tree-node.leaf-danger{stroke:var(--danger)}.tree-edge{fill:none;stroke:var(--muted);stroke-width:2.5}.tree-label{fill:var(--heading);font-size:16px;font-weight:700}.tree-branch{fill:var(--muted);font-size:14px}.tree-stack{display:grid;gap:.65rem;max-width:500px;margin:auto}.tree-stack .level{display:grid;gap:.55rem}.tree-stack .level.two{grid-template-columns:1fr 1fr}.tree-stack .node{border:2px solid var(--brand);background:var(--surface-2);border-radius:.7rem;padding:.65rem;text-align:center;color:var(--heading);font-weight:800}.tree-stack .node.root{border-color:var(--amber)}.tree-stack .node.leaf{border-color:var(--ok)}.tree-stack .connector{text-align:center;color:var(--muted);font-weight:900}.split-demo{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.45rem;direction:ltr}.split-demo .sample{border:1px solid var(--line);border-radius:.55rem;background:var(--surface-2);padding:.55rem;text-align:center}.split-demo .yes{box-shadow:inset 0 -4px var(--ok)}.split-demo .no{box-shadow:inset 0 -4px var(--danger)}.thresholds{display:flex;align-items:center;justify-content:center;gap:.55rem;flex-wrap:wrap;direction:ltr}.thresholds .candidate{border:1px dashed var(--amber);border-radius:999px;padding:.25rem .65rem;color:var(--amber);background:color-mix(in srgb,var(--amber) 10%,var(--surface))}.purity-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}.purity-box{border:1px solid var(--line);border-radius:.75rem;background:var(--surface-2);padding:.85rem;text-align:center}.dots{display:flex;flex-wrap:wrap;gap:.3rem;justify-content:center;margin:.6rem auto}.dot{width:16px;height:16px;border-radius:50%;background:var(--ok)}.dot.alt{background:var(--danger)}.pixel-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;max-width:320px;aspect-ratio:1;margin:1rem auto;background:var(--line);padding:2px}.pixel-grid span{background:rgb(var(--p));transition:transform .15s}.pixel-grid span:hover{transform:scale(1.2);outline:2px solid var(--focus);z-index:1}.channel-card{min-height:145px;display:grid;place-items:center;text-align:center;border:1px solid var(--line);border-radius:.8rem;padding:1rem;background:var(--surface-2)}.channel-card b{font-size:1.4rem}.channel-card.blue{box-shadow:inset 0 4px #3b82f6}.channel-card.green{box-shadow:inset 0 4px #22c55e}.channel-card.red{box-shadow:inset 0 4px #ef4444}.compact-list{margin:.4rem 0 1rem;padding-right:1.25rem}.compact-list li{margin:.25rem 0}.code-block pre{max-height:34rem}
+@media(max-width:680px){.diagram svg.tree-wide{display:none}.tree-mobile{display:block}.split-demo{grid-template-columns:1fr}.purity-row{grid-template-columns:1fr}.thresholds{align-items:stretch;flex-direction:column}.thresholds .candidate{text-align:center}.pixel-grid{max-width:260px}.diagram .tree-stack{direction:rtl}}
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">رفتن به محتوای اصلی</a>
+  <header class="appbar"><button class="icon-btn menu-btn" id="menu-button" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="بازکردن فهرست">☰</button><div class="brand">جلسهٔ ۶ — مستند توضیحی</div><button class="search-trigger" id="search-trigger" type="button" aria-haspopup="dialog"><span class="search-label">جستجو در متن و کدها</span><span class="shortcut">Ctrl K</span></button><button class="icon-btn" id="theme-toggle" type="button" aria-label="تغییر پوسته" title="تغییر پوسته">◐</button></header>
+  <button class="overlay" id="drawer-overlay" type="button" aria-label="بستن فهرست"></button>
+  <div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="فهرست مستند" tabindex="-1">
+    <div class="side-title">نقشهٔ جلسهٔ ششم</div>
+    <details class="nav-group" open><summary>شروع و ساختار درخت</summary><a class="toc" href="#start">شروع مستند</a><a class="toc" href="#overview">تصویر کلی</a><a class="toc" href="#sources">منابع جلسه</a><a class="toc" href="#interpretability">چرا Decision Tree؟</a><a class="toc" href="#tree-anatomy">Root، Node و Leaf</a></details>
+    <details class="nav-group" open><summary>یادگیری یک درخت</summary><a class="toc" href="#manual-tree">مثال تصمیم‌گیری</a><a class="toc" href="#thresholds">پیداکردن Threshold</a><a class="toc" href="#impurity">Gini و Entropy</a><a class="toc" href="#growth">رشد بازگشتی</a><a class="toc" href="#regression-tree">Tree برای Regression</a><a class="toc" href="#pruning">کنترل پیچیدگی</a></details>
+    <details class="nav-group"><summary>Iris و scikit-learn</summary><a class="toc" href="#iris">ساخت مدل Iris</a><a class="toc" href="#read-tree">خواندن plot_tree</a><a class="toc" href="#evaluation">ارزیابی درست</a><a class="toc" href="#importance">Feature Importance</a><a class="toc" href="#forest">از Tree تا Forest</a></details>
+    <details class="nav-group"><summary>GPU و دادهٔ بزرگ</summary><a class="toc" href="#rapids">RAPIDS و cuML</a><a class="toc" href="#mnist">SVC روی MNIST</a><a class="toc" href="#kaggle">دریافت Dataset</a></details>
+    <details class="nav-group"><summary>پردازش تصویر</summary><a class="toc" href="#pixels">تصویر یعنی Array</a><a class="toc" href="#opencv">عملیات OpenCV</a><a class="toc" href="#video">Webcam و VideoCapture</a></details>
+    <details class="nav-group"><summary>پایان جلسه</summary><a class="toc" href="#file-notes">دام‌های فایل‌ها</a><a class="toc" href="#review">خودآزمایی</a><a class="toc" href="#glossary">واژه‌نامه</a></details>
+    <div class="source-note">برگرفته از سه ضبط جلسه، دو Notebook، دو Script و فایل تصویری جلسه؛ با بازبینی گفتار، تصویر و اجرای تمیز کدهای محلی.</div>
+  </aside>
+  <main id="main-content">
+    <header class="hero" id="start">
+      <span class="eyebrow">یادگیری ماشین — جلسهٔ ششم</span>
+      <h1>یک Decision Tree چطور با سؤال‌های ساده تصمیم می‌گیرد؟</h1>
+      <p>این جلسه از یک ایدهٔ شهودی شروع می‌شود: مسئله را با سؤال‌های پشت‌سرهم به بخش‌های ساده‌تر تقسیم کنیم. بعد همین ایده را با <code>Gini</code> و <code>Entropy</code> دقیق می‌کنیم، روی Iris می‌سازیم و می‌خوانیم، محدودیت‌هایش را می‌بینیم و در ادامه با اجرای GPU و مقدمات OpenCV آشنا می‌شویم.</p>
+      <div class="chips"><span class="chip">Decision Tree</span><span class="chip">Gini و Entropy</span><span class="chip">Iris</span><span class="chip">RAPIDS / cuML</span><span class="chip">OpenCV</span></div>
+    </header>
+
+    <section class="section card" id="overview">
+      <h2 class="section-title">نقشهٔ یادگیری جلسه</h2>
+      <p>درخت تصمیم قرار نیست یک فرمول بزرگ را یک‌باره یاد بگیرد. در هر Node فقط یک Feature و یک شرط را انتخاب می‌کند؛ مثلاً «آیا سن بیشتر از ۵۶ است؟». هر پاسخ، داده را به یک شاخه می‌فرستد و این تقسیم آن‌قدر ادامه پیدا می‌کند تا گروه‌های حاصل تا حد مناسبی خالص یا کوچک شوند.</p>
+      <div class="flow"><span class="box">دادهٔ مخلوط</span><i class="arrow">←</i><span class="box">ساخت Candidate Split</span><i class="arrow">←</i><span class="box">سنجش Impurity</span><i class="arrow">←</i><span class="box">انتخاب بهترین Split</span><i class="arrow">←</i><span class="box">تکرار روی شاخه‌ها</span></div>
+      <div class="note info"><strong>سؤال مرکزی:</strong> چه سؤال ساده‌ای در این Node بیشترین جداسازی مفید را ایجاد می‌کند، بدون اینکه درخت بی‌دلیل عمیق و حفظ‌کنندهٔ Noise شود؟</div>
+    </section>
+
+    <section class="section card" id="sources">
+      <h2 class="section-title">۱. ضبط‌ها و فایل‌های بررسی‌شده</h2>
+      <p>سه ضبط بر اساس شمارهٔ پایانی نام فایل مرتب شدند. مجموع زمان جلسه حدود ۳ ساعت و ۱۹ دقیقه است. گفتار هر سه ضبط، صفحهٔ مدرس، Notebookها و Scriptها با هم تطبیق داده شدند.</p>
+      <div class="grid3"><div class="record"><strong><bdi>0001</bdi> — ۱:۱۴:۳۱</strong><p>Interpretability، مقدمهٔ Graph و Tree، اجزای درخت، Binary Tree، مثال دستی Split، مفهوم Nodeهای خالص و پیچیده، توقف رشد و مقدمهٔ Gini/Entropy.</p></div><div class="record"><strong><bdi>0002</bdi> — ۱:۱۷:۲۳</strong><p>محاسبهٔ Gini و Entropy، Candidate Thresholdها، Iris، آموزش و رسم DecisionTreeClassifier، خواندن Nodeها، Hyperparameterها و Feature Importance.</p></div><div class="record"><strong><bdi>0003</bdi> — ۰:۴۷:۲۶</strong><p>RAPIDS و cuML روی Colab GPU، SVC و MNIST، دریافت Dataset از Kaggle، اشاره به Random Forest و سپس تصویر، Channelها، Canny و Webcam در OpenCV.</p></div></div>
+      <p>فایل‌های محوری: <code>01.ipynb</code> برای Decision Tree، <code>ML_06.ipynb</code> برای محیط GPU، <code>01.py</code> و <code>02.py</code> برای OpenCV، فایل متنی <code>datasets</code> و تصویر <code>download.png</code>.</p>
+      <div class="note warn"><strong>روش نگارش:</strong> این صفحه Timeline یا رونویسی خام نیست. مطالب تکراری یک‌بار و در ترتیب آموزشی منسجم آمده‌اند. هرجا کد ذخیره‌شده ناقص یا نتیجه‌اش خوش‌بینانه بوده، همان‌جا با هشدار مشخص شده است.</div>
+    </section>
+
+    <section class="section card" id="interpretability">
+      <h2 class="section-title">۲. چرا Decision Tree قابل توضیح‌تر است؟</h2>
+      <p>در ابتدای جلسه بحث از Interpretability شروع می‌شود. در مدل خطی می‌توانیم Coefficientها را ببینیم، اما وقتی رابطه‌ها پیچیده و شرطی می‌شوند، توضیح یک عدد برای هر Feature همیشه کافی نیست. Decision Tree تصمیم را به مجموعه‌ای از شرط‌های قابل‌ردگیری تبدیل می‌کند.</p>
+      <div class="grid2"><div class="mini"><strong>مدل خطی</strong><p>اثر Featureها را در یک ترکیب عددی مثل <bdi>w₁x₁ + w₂x₂</bdi> جمع می‌کند. خواندن Coefficient مفید است، اما Interactionهای شرطی را مستقیم نشان نمی‌دهد.</p></div><div class="mini"><strong>Decision Tree</strong><p>مسیر هر پیش‌بینی را می‌توان سؤال‌به‌سؤال دنبال کرد: این نمونه از کدام شرط عبور کرد و چرا به این Leaf رسید؟</p></div></div>
+      <div class="note ok"><strong>مزیت عملی:</strong> برای یک نمونهٔ خاص می‌توان مسیر Root تا Leaf را نشان داد. این توضیح محلی، تصمیم مدل را برای دانشجو یا متخصص حوزه قابل پیگیری می‌کند.</div>
+      <div class="note warn"><strong>اما شفاف‌بودن مساوی درست‌بودن نیست:</strong> یک درخت عمیق هم قابل رسم است، ولی ممکن است دادهٔ آموزش را حفظ کرده باشد و روی ورودی جدید ضعیف عمل کند.</div>
+    </section>
+
+    <section class="section card" id="tree-anatomy">
+      <h2 class="section-title">۳. از Graph به Tree: Root، Edge، Node و Leaf</h2>
+      <p>مدرس قبل از ورود به الگوریتم، Tree را به‌عنوان نوع خاصی از Graph معرفی می‌کند. Graph از Nodeها و Edgeها ساخته می‌شود. Tree از یک Root شروع می‌شود، مسیر چرخه‌ای ندارد و رابطهٔ والد–فرزند در آن روشن است. Node داخلی سؤال می‌پرسد و Leaf نتیجهٔ نهایی را نگه می‌دارد.</p>
+      <div class="grid3"><div class="mini"><strong>Directed / Undirected</strong><p>در Graph جهت‌دار، Edge مسیر مشخصی دارد؛ مثل Link از یک صفحه به صفحهٔ دیگر. در Graph بدون‌جهت ارتباط دوطرفه در نظر گرفته می‌شود.</p></div><div class="mini"><strong>Weighted / Unweighted</strong><p>Edge می‌تواند وزنی مثل فاصله، هزینه یا شدت ترافیک داشته باشد؛ یا فقط وجود اتصال را نشان دهد.</p></div><div class="mini"><strong>Path و Shortest Path</strong><p>مسیر دنباله‌ای از Edgeها بین Nodeهاست. الگوریتم‌های مسیریابی با توجه به وزن، مسیر کم‌هزینه‌تر را پیدا می‌کنند.</p></div></div>
+      <div class="note info"><strong>پیش‌نیاز معرفی‌شده:</strong> مدرس Library پایتونی <code>NetworkX</code> را برای ساخت، رسم و اجرای الگوریتم‌های Graph نام می‌برد، اما در فایل‌های این جلسه کد عملی NetworkX ذخیره نشده است.</div>
+      <div class="diagram"><div class="diagram-title">ساختار یک درخت تصمیم دودویی</div>
+        <svg class="tree-wide" viewBox="0 0 900 500" role="img" aria-label="درخت تصمیم با ریشه، دو گره داخلی و چهار برگ"><path class="tree-edge" d="M450 95L255 205M450 95L645 205M255 270L135 390M255 270L360 390M645 270L540 390M645 270L765 390"/><g><rect class="tree-node root" x="315" y="35" width="270" height="60" rx="14"/><text class="tree-label" x="450" y="72" text-anchor="middle" direction="rtl">آیا سن بیشتر از ۵۶ است؟</text><rect class="tree-node" x="130" y="205" width="250" height="65" rx="14"/><text class="tree-label" x="255" y="245" text-anchor="middle" direction="rtl">آیا BMI بیشتر از ۲۵ است؟</text><rect class="tree-node" x="520" y="205" width="250" height="65" rx="14"/><text class="tree-label" x="645" y="245" text-anchor="middle" direction="rtl">آیا قند بیشتر از ۱۰ است؟</text><rect class="tree-node leaf-ok" x="60" y="390" width="150" height="58" rx="14"/><text class="tree-label" x="135" y="426" text-anchor="middle">Leaf A</text><rect class="tree-node leaf-danger" x="285" y="390" width="150" height="58" rx="14"/><text class="tree-label" x="360" y="426" text-anchor="middle">Leaf B</text><rect class="tree-node leaf-ok" x="465" y="390" width="150" height="58" rx="14"/><text class="tree-label" x="540" y="426" text-anchor="middle">Leaf A</text><rect class="tree-node leaf-danger" x="690" y="390" width="150" height="58" rx="14"/><text class="tree-label" x="765" y="426" text-anchor="middle">Leaf B</text><text class="tree-branch" x="330" y="155">True</text><text class="tree-branch" x="565" y="155">False</text></g></svg>
+        <div class="tree-mobile"><div class="tree-stack"><div class="node root">Root: سن &gt; ۵۶؟</div><div class="connector">↓ True / False ↓</div><div class="level two"><div class="node">BMI &gt; ۲۵؟</div><div class="node">قند &gt; ۱۰؟</div></div><div class="connector">↓ مسیر هر نمونه ↓</div><div class="level two"><div class="node leaf">Leaf: Class A</div><div class="node leaf">Leaf: Class B</div></div></div></div>
+        <small>در نسخهٔ موبایل، نمودار به‌جای کوچک‌شدن افراطی، به چیدمان عمودی تبدیل می‌شود.</small></div>
+      <div class="grid4"><div class="mini"><strong>Root</strong><p>اولین Node و نقطهٔ ورود همهٔ نمونه‌ها.</p></div><div class="mini"><strong>Internal Node</strong><p>یک شرط روی Feature می‌سازد و داده را تقسیم می‌کند.</p></div><div class="mini"><strong>Edge</strong><p>مسیر پاسخ شرط، معمولاً True یا False.</p></div><div class="mini"><strong>Leaf</strong><p>دیگر تقسیم نمی‌شود و Prediction را می‌دهد.</p></div></div>
+      <div class="note info"><strong>Binary Tree:</strong> در پیاده‌سازی رایج scikit-learn هر Node حداکثر دو Child دارد؛ اما Binaryبودن به معنی متقارن، کامل یا هم‌عمق‌بودن همهٔ شاخه‌ها نیست.</div>
+    </section>
+
+    <section class="section card" id="manual-tree">
+      <h2 class="section-title">۴. مثال دستی: سؤال‌ها چطور مسیر می‌سازند؟</h2>
+      <p>در مثال دستی جلسه، چند Feature عددی مثل سن، BMI و یک شاخص آزمایشگاهی کنار Label قرار می‌گیرند. درخت ابتدا سؤال اثرگذارتری مثل «سن بیشتر از ۵۶ است؟» را انتخاب می‌کند؛ بعد هر سمت را با سؤال دیگری جدا می‌کند. یک نمونه فقط یک مسیر را طی می‌کند، نه همهٔ Nodeها را.</p>
+      <div class="split-demo"><div class="sample yes"><bdi>سن ۳۰</bdi><br>Class ✓</div><div class="sample yes"><bdi>سن ۵۰</bdi><br>Class ✓</div><div class="sample no"><bdi>سن ۵۵</bdi><br>Class ✕</div><div class="sample yes"><bdi>سن ۵۸</bdi><br>Class ✓</div><div class="sample no"><bdi>سن ۶۰</bdi><br>Class ✕</div></div>
+      <p>اگر یک شرط گروه‌ها را کاملاً جدا نکند، این شکست نیست. Child حاصل دوباره با Feature یا Threshold دیگری تقسیم می‌شود. درخت مجموعه‌ای از تقسیم‌های محلی است که با هم یک قانون پیچیده‌تر می‌سازند.</p>
+      <div class="note warn"><strong>شرط‌ها حقیقت پزشکی یا کسب‌وکاری نیستند:</strong> Threshold از داده و معیار الگوریتم آمده است. اینکه مدل «سن» را اول انتخاب کرده، به‌تنهایی اثبات رابطهٔ علّی یا نظر متخصص حوزه نیست.</div>
+    </section>
+
+    <section class="section card" id="thresholds">
+      <h2 class="section-title">۵. Candidate Thresholdها از کجا می‌آیند؟</h2>
+      <p>برای Feature عددی، مقدارها مرتب می‌شوند و معمولاً نقطهٔ میانی بین مقدارهای متوالی به‌عنوان Candidate بررسی می‌شود. اگر سن‌ها ۳۰، ۵۰، ۵۵، ۵۸ و ۶۰ باشند، Candidateها ۴۰، ۵۲٫۵، ۵۶٫۵ و ۵۹ هستند.</p>
+      <div class="diagram"><div class="diagram-title">مرتب‌سازی مقدارها و ساخت مرزهای کاندیدا</div><div class="thresholds"><span>۳۰</span><span class="candidate">۴۰</span><span>۵۰</span><span class="candidate">۵۲٫۵</span><span>۵۵</span><span class="candidate">۵۶٫۵</span><span>۵۸</span><span class="candidate">۵۹</span><span>۶۰</span></div><small>الگوریتم برای هر Candidate کیفیت گروه چپ و راست را محاسبه می‌کند.</small></div>
+      <p>این جست‌وجو برای Featureهای مجاز تکرار می‌شود. Split برنده فقط Threshold خوبی روی یک ستون نیست؛ باید بعد از درنظرگرفتن تعداد نمونه‌های هر Child، کمترین ناخالصی وزنی یا بیشترین کاهش ناخالصی را بسازد.</p>
+      <div class="equation">Impurity_after = (n_left / n) I_left + (n_right / n) I_right</div>
+      <div class="equation">Gain = I_parent − Impurity_after</div>
+    </section>
+
+    <section class="section card" id="impurity">
+      <h2 class="section-title">۶. Gini و Entropy چه چیزی را اندازه می‌گیرند؟</h2>
+      <p>هدف این دو معیار اندازه‌گیری مخلوط‌بودن Classها داخل یک Node است. وقتی همهٔ نمونه‌ها از یک Class باشند، Node خالص و Impurity صفر است. هرچه نسبت Classها به هم نزدیک‌تر شود، عدم قطعیت بالاتر می‌رود.</p>
+      <div class="grid2"><div class="mini"><strong>Gini Impurity</strong><div class="equation">Gini = 1 − Σ pᵢ²</div><p>احتمال خطا در برچسب‌گذاری تصادفی بر اساس توزیع Classها را بازتاب می‌دهد. معیار پیش‌فرض DecisionTreeClassifier است.</p></div><div class="mini"><strong>Entropy</strong><div class="equation">Entropy = −Σ pᵢ log₂(pᵢ)</div><p>مقدار عدم قطعیت توزیع را می‌سنجد. در یک مسئلهٔ دودویی، برای نسبت ۵۰/۵۰ بیشینه و برای Node خالص صفر است.</p></div></div>
+      <div class="purity-row"><div class="purity-box"><strong>خالص</strong><div class="dots"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div><span><bdi>Gini = 0</bdi></span></div><div class="purity-box"><strong>نسبتاً خالص</strong><div class="dots"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot alt"></i></div><span>Impurity کم</span></div><div class="purity-box"><strong>مخلوط</strong><div class="dots"><i class="dot"></i><i class="dot alt"></i><i class="dot"></i><i class="dot alt"></i><i class="dot"></i><i class="dot alt"></i></div><span>Impurity زیاد</span></div></div>
+      <details><summary>مثال عددیِ تکمیلی این مستند</summary><p>اگر Node شامل ۸ نمونهٔ آبی و ۲ نمونهٔ قرمز باشد، نسبت‌ها ۰٫۸ و ۰٫۲ هستند؛ پس <bdi>Gini = 1 − (0.8² + 0.2²) = 0.32</bdi>. اگر هر ۱۰ نمونه آبی شوند، Gini صفر می‌شود. این مثال فقط برای روشن‌شدن فرمول به مستند افزوده شده است.</p></details>
+      <div class="note info"><strong>Gini یا Entropy؟</strong> هر دو در بسیاری از داده‌ها Splitهای نزدیک تولید می‌کنند. انتخاب Criterion باید با Validation سنجیده شود؛ اسم پیچیده‌تر یا محاسبهٔ طولانی‌تر به‌تنهایی دلیل بهتر بودن نیست.</div>
+    </section>
+
+    <section class="section card" id="growth">
+      <h2 class="section-title">۷. رشد بازگشتی و شرط توقف</h2>
+      <p>بعد از انتخاب بهترین Split در Root، همان فرایند مستقل روی Childها اجرا می‌شود. این Recursion می‌تواند تا خالص‌شدن Leafها یا تمام‌شدن امکان Split ادامه پیدا کند. اگر هیچ محدودیتی نگذاریم، درخت ممکن است برای چند نمونهٔ خاص شاخه‌های ریز بسازد.</p>
+      <div class="flow"><span class="box">Node فعلی</span><i class="arrow">←</i><span class="box">بهترین Feature/Threshold</span><i class="arrow">←</i><span class="box">Left / Right</span><i class="arrow">←</i><span class="box">بررسی توقف</span><i class="arrow">←</i><span class="box">تکرار</span></div>
+      <div class="grid3"><div class="mini"><strong>Pure Node</strong><p>همهٔ نمونه‌ها یک Class دارند؛ ادامهٔ Split ارزشی ندارد.</p></div><div class="mini"><strong>حد Complexity</strong><p>مثل رسیدن به <code>max_depth</code> یا کوچک‌شدن Node.</p></div><div class="mini"><strong>کاهش ناکافی</strong><p>Split جدید Impurity را به‌اندازهٔ لازم کم نمی‌کند.</p></div></div>
+    </section>
+
+    <section class="section card" id="regression-tree">
+      <h2 class="section-title">۸. Decision Tree فقط برای Classification نیست</h2>
+      <p>در پایان بخش مفهومی ضبط اول، مدرس تأکید می‌کند که ساختار Tree برای Regression هم قابل استفاده است؛ مثلاً پیش‌بینی قیمت، فشار خون یا یک مقدار پیوستهٔ دیگر. تفاوت اصلی در نوع پاسخ Leaf و معیاری است که کیفیت Split را می‌سنجد.</p>
+      <div class="grid2"><div class="mini"><strong>Classification Tree</strong><p>Leaf یک Class یا توزیع احتمال Classها را می‌دهد و Split با معیارهایی مثل Gini یا Entropy سنجیده می‌شود.</p></div><div class="mini"><strong>Regression Tree</strong><p>Leaf یک مقدار عددی می‌دهد. هدف Split این است که مقدارهای y داخل Childها به هم نزدیک‌تر شوند و خطای عددی کاهش پیدا کند.</p></div></div>
+      <details><summary>تکمیل کوتاه برای خواندن خروجی Regression Tree</summary><p>در پیاده‌سازی رایج و با Criterion مربعی، Prediction یک Leaf میانگین yهای آموزشی رسیده به آن است. بنابراین خروجی Tree به‌صورت ناحیه‌های پله‌ای تغییر می‌کند، نه یک خط صاف. این توضیح برای کامل‌کردن مفهوم Regression Tree به مستند افزوده شده است.</p></details>
+      <div class="note info"><strong>همان منطق، پاسخ متفاوت:</strong> در هر دو حالت Feature و Threshold انتخاب می‌شوند؛ چیزی که عوض می‌شود تعریف «بهترشدن گروه‌ها» و خروجی نهایی Leaf است.</div>
+    </section>
+
+    <section class="section card" id="pruning">
+      <h2 class="section-title">۹. Pre-pruning و Post-pruning؛ درخت را کجا مهار کنیم؟</h2>
+      <p>مدرس رشد کنترل‌نشده را با Overfitting پیوند می‌دهد. دو نگاه اصلی داریم: از ابتدا اجازه ندهیم شاخه‌های خیلی ریز ساخته شوند، یا ابتدا درخت را بسازیم و بعد شاخه‌های کم‌ارزش را حذف کنیم.</p>
+      <div class="tabs" data-tabs><div role="tablist" aria-label="مقایسه روش‌های هرس"><button role="tab" aria-selected="true" aria-controls="tab-pre" id="tab-pre-btn">Pre-pruning</button><button role="tab" aria-selected="false" aria-controls="tab-post" id="tab-post-btn" tabindex="-1">Post-pruning</button></div><div role="tabpanel" id="tab-pre" aria-labelledby="tab-pre-btn"><p>با پارامترهایی مثل <code>max_depth</code>، <code>min_samples_split</code>، <code>min_samples_leaf</code> و <code>min_impurity_decrease</code> جلوی رشد بی‌قاعده را همان زمان Fit می‌گیریم.</p></div><div role="tabpanel" id="tab-post" aria-labelledby="tab-post-btn" hidden><p>درخت بزرگ‌تر ساخته می‌شود و سپس شاخه‌هایی که ارزش تعمیم ندارند حذف می‌شوند. در scikit-learn پارامتر <code>ccp_alpha</code> ابزار Cost-Complexity Pruning است؛ این نام در کد جلسه استفاده نشده و این توضیح به‌عنوان تکمیل مستقیم مفهوم Pruning آمده است.</p></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Hyperparameter</th><th>اثر اصلی</th><th>اگر خیلی محدود شود</th><th>اگر آزاد بماند</th></tr></thead><tbody><tr><td><code>max_depth</code></td><td>بیشترین عمق Root تا Leaf</td><td>Underfitting</td><td>شاخه‌های عمیق و Overfitting</td></tr><tr><td><code>min_samples_split</code></td><td>حداقل نمونه برای شکستن Node</td><td>Nodeهای مفید باز نمی‌شوند</td><td>Nodeهای بسیار کوچک ساخته می‌شوند</td></tr><tr><td><code>min_samples_leaf</code></td><td>حداقل نمونه در هر Leaf</td><td>مرز تصمیم بیش از حد صاف</td><td>Leafهای تک‌نمونه‌ای</td></tr><tr><td><code>min_impurity_decrease</code></td><td>حداقل Gain لازم برای Split</td><td>رشد زود متوقف می‌شود</td><td>تقسیم‌های کم‌اثر پذیرفته می‌شوند</td></tr><tr><td><code>max_features</code></td><td>تعداد Featureهای بررسی‌شده در هر Split</td><td>ممکن است Split مهم دیده نشود</td><td>هزینهٔ جست‌وجو و همبستگی Treeها بیشتر</td></tr><tr><td><code>class_weight</code></td><td>وزن Classها در معیار Split</td><td>وزن نامناسب Bias می‌سازد</td><td>Class نادر ممکن است نادیده بماند</td></tr><tr><td><code>splitter</code></td><td><code>best</code> یا انتخاب تصادفی‌تر</td><td>تصادفی‌بودن زیاد Accuracy را کم می‌کند</td><td><code>best</code> همیشه تعمیم بهتر را تضمین نمی‌کند</td></tr><tr><td><code>random_state</code></td><td>تکرارپذیری انتخاب‌های تصادفی و Tieها</td><td>—</td><td>خروجی یا Importance ممکن است بین اجراها تغییر کند</td></tr></tbody></table></div>
+    </section>
+
+    <section class="section card" id="iris">
+      <h2 class="section-title">۱۰. ساخت DecisionTreeClassifier روی Iris</h2>
+      <p>مثال کدنویسی اصلی از Iris استفاده می‌کند: ۱۵۰ نمونه، چهار Feature عددی و سه Class متوازن با ۵۰ نمونه برای هر گونه. Notebook ابتدا روی همهٔ X Fit می‌کند و سپس روی همان X پیش‌بینی می‌گیرد.</p>
+      <pre data-file="iris_tree.py" data-summary="مدل پایهٔ نوشته‌شده در جلسه" data-highlight="7,8,9">from sklearn.datasets import load_iris
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+import matplotlib.pyplot as plt
+
+iris = load_iris()
+X, y = iris.data, iris.target
+clf = DecisionTreeClassifier(criterion="entropy")
+clf.fit(X, y)
+y_pred = clf.predict(X)
+
+plt.figure(figsize=(12, 12))
+plot_tree(clf, filled=True,
+          feature_names=iris.feature_names,
+          class_names=iris.target_names,
+          rounded=True)
+plt.show()</pre>
+      <div class="grid3"><div class="mini"><strong>Featureها</strong><p>طول و عرض Sepal، طول و عرض Petal؛ همگی بر حسب سانتی‌متر.</p></div><div class="mini"><strong>Classها</strong><p><code>setosa</code>، <code>versicolor</code> و <code>virginica</code>.</p></div><div class="mini"><strong>Balance</strong><p>هر Class دقیقاً ۵۰ نمونه دارد؛ Histogram ذخیره‌شده هم همین را نشان می‌دهد.</p></div></div>
+    </section>
+
+    <section class="section card" id="read-tree">
+      <h2 class="section-title">۱۱. هر جعبه در plot_tree چه می‌گوید؟</h2>
+      <p>برای خواندن شکل باید از Root شروع کنیم. شرط بالای Node مسیر را تعیین می‌کند؛ شاخهٔ چپ شرط True و شاخهٔ راست False است. بقیهٔ خط‌ها وضعیت داده‌های رسیده به همان Node را خلاصه می‌کنند.</p>
+      <div class="diagram"><div class="diagram-title">نمونهٔ خواندن Root در Iris</div><svg viewBox="0 0 860 320" role="img" aria-label="گره نمونه درخت Iris"><path class="tree-edge" d="M430 190L250 270M430 190L610 270"/><rect class="tree-node root" x="255" y="35" width="350" height="155" rx="18"/><text class="tree-label" x="430" y="75" text-anchor="middle">petal length ≤ 2.45</text><text class="tree-label" x="430" y="108" text-anchor="middle">gini = 0.667</text><text class="tree-label" x="430" y="141" text-anchor="middle">samples = 150</text><text class="tree-label" x="430" y="174" text-anchor="middle">value = [50, 50, 50]</text><text class="tree-branch" x="310" y="230">True</text><text class="tree-branch" x="540" y="230">False</text><rect class="tree-node leaf-ok" x="130" y="265" width="240" height="48" rx="12"/><text class="tree-label" x="250" y="296" text-anchor="middle">اغلب setosa</text><rect class="tree-node" x="490" y="265" width="240" height="48" rx="12"/><text class="tree-label" x="610" y="296" text-anchor="middle">versicolor / virginica</text></svg></div>
+      <div class="table-wrap"><table><thead><tr><th>فیلد</th><th>معنا</th></tr></thead><tbody><tr><td>شرط</td><td>Feature و Thresholdی که بهترین Split این Node را ساخته‌اند.</td></tr><tr><td><code>gini</code> / <code>entropy</code></td><td>میزان مخلوط‌بودن Labelها در همین Node.</td></tr><tr><td><code>samples</code></td><td>تعداد Sampleهای رسیده به Node.</td></tr><tr><td><code>value</code></td><td>تعداد یا وزن نمونه‌های هر Class، به ترتیب Classهای مدل.</td></tr><tr><td><code>class</code></td><td>Class غالب و Prediction آن Node اگر همین‌جا توقف کنیم.</td></tr><tr><td>رنگ</td><td>Hue نمایندهٔ Class غالب و شدت رنگ نشانهٔ خالص‌ترشدن Node است.</td></tr></tbody></table></div>
+    </section>
+
+    <section class="section card" id="evaluation">
+      <h2 class="section-title">۱۲. چرا Accuracy برابر ۱٫۰۰ هنوز موفقیت نیست؟</h2>
+      <p>خروجی ذخیره‌شدهٔ Notebook برای هر سه Class امتیاز ۱٫۰۰ نشان می‌دهد، چون مدل روی همهٔ داده Fit شده و همان داده دوباره به <code>predict</code> داده شده است. این فقط Training Performance را اندازه می‌گیرد.</p>
+      <div class="grid2"><div class="note danger"><strong>روش فعلی Notebook:</strong> <code>fit(X, y)</code> و سپس <code>predict(X)</code>. درخت بدون محدودیت می‌تواند نمونه‌های آموزش را تا حد زیادی حفظ کند.</div><div class="note ok"><strong>روش قابل اعتماد:</strong> قبل از Fit، داده را به train و test تقسیم کن؛ در حالت بهتر Hyperparameterها را روی Validation/Cross-Validation انتخاب کن و test را برای قضاوت نهایی نگه دار.</div></div>
+      <pre data-file="iris_tree_evaluation.py" data-summary="نسخهٔ ارزیابی‌شده با Split طبقه‌بندی‌شده" data-highlight="6,9,10">from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+from sklearn.tree import DecisionTreeClassifier
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, stratify=y, random_state=42)
+
+clf = DecisionTreeClassifier(max_depth=3, random_state=42)
+clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)
+print(classification_report(y_test, y_pred,
+                            target_names=iris.target_names))</pre>
+      <div class="note info"><strong>نکتهٔ تکمیلی:</strong> در اجرای کنترلی این مستند، Tree بدون محدودیت با Split ثابت روی train امتیاز ۱٫۰۰ و روی test حدود ۰٫۹۳ گرفت. این عدد Benchmark رسمی جلسه نیست؛ فقط نشان می‌دهد فاصلهٔ train و test واقعاً وجود دارد.</div>
+      <div class="note warn"><strong>Sampling باید نمایندهٔ دنیای واقعی باشد:</strong> مدرس مثال می‌زند که اگر آموزش فقط از افراد زیر ۶۰ سال آمده باشد، نمی‌توان با خیال راحت دربارهٔ فرد ۸۰ ساله نتیجه گرفت. train و test باید پوشش مناسبی از گروه‌های مهم داشته باشند؛ Cross-Validation هم مدل را روی چند ترکیب متفاوت می‌سنجد تا نتیجه به یک Split خاص وابسته نباشد.</div>
+    </section>
+
+    <section class="section card" id="importance">
+      <h2 class="section-title">۱۳. Feature Importance و فرق آن با Correlation</h2>
+      <p><code>feature_importances_</code> سهم نسبی Featureها در کاهش Impurity داخل همان درخت را جمع‌بندی می‌کند. Notebook نمودار میله‌ای آن را رسم می‌کند و بعد Heatmap همبستگی را کنار آن می‌گذارد.</p>
+      <div class="grid2"><div class="mini"><strong>Feature Importance</strong><p>وابسته به Tree، Splitها و Hyperparameterهاست. مقدار بالا یعنی Feature در کاهش Impurity این مدل نقش بیشتری داشته است.</p></div><div class="mini"><strong>Correlation</strong><p>رابطهٔ آماری دوتایی، معمولاً خطی، بین ستون‌ها را نشان می‌دهد. ممکن است با Importance هم‌جهت نباشد.</p></div></div>
+      <pre data-file="feature_importance.py" data-summary="نمودار اهمیت Featureها در فایل جلسه" data-highlight="1,2">plt.bar(iris.feature_names, clf.feature_importances_)
+plt.xticks(rotation=25)
+plt.show()</pre>
+      <div class="note warn"><strong>خروجی دقیق ثابت نیست:</strong> Notebook برای Tree مقدار <code>random_state</code> تعیین نکرده است. در Splitهای هم‌ارزش، ترتیب تصادفی Featureها می‌تواند ساختار و Importance ذخیره‌شده را بین اجراها تغییر دهد.</div>
+      <div class="note info"><strong>کاربردی که در گفتار مطرح شد:</strong> می‌توان Importance را سرنخی برای Feature Selection گرفت و مدل دیگری را با Featureهای مهم‌تر ساخت؛ اما این انتخاب باید دوباره روی Validation سنجیده شود، چون Importance وابسته به همین Dataset و همین Tree است.</div>
+      <div class="note danger"><strong>اهمیت مساوی علت نیست:</strong> Feature Importance توضیح رفتار Model است، نه اثبات رابطهٔ علّی در دنیای واقعی. Featureهای هم‌بسته هم می‌توانند اهمیت را بین خود تقسیم یا جابه‌جا کنند.</div>
+    </section>
+
+    <section class="section card" id="forest">
+      <h2 class="section-title">۱۴. از یک Tree به Random Forest</h2>
+      <p>در ضبط سوم Random Forest به‌عنوان ادامهٔ طبیعی بحث مطرح می‌شود: به‌جای تکیه بر یک Tree حساس، چند Tree با تنوع در Sampleها یا Featureها ساخته می‌شوند و خروجی آن‌ها با رأی یا میانگین ترکیب می‌شود. پیاده‌سازی کامل Random Forest در فایل‌های این جلسه انجام نشده است.</p>
+      <div class="diagram"><div class="diagram-title">ایدهٔ Ensemble: چند دید متفاوت، یک خروجی</div><div class="flow"><span class="box">داده</span><i class="arrow">←</i><span class="box">Tree A</span><i class="arrow">+</i><span class="box">Tree B</span><i class="arrow">+</i><span class="box">Tree C</span><i class="arrow">←</i><span class="box">Vote / Average</span></div><small>این شکل توضیحی است؛ جزئیات Sampling و Random Forest به جلسه‌های بعد موکول شده‌اند.</small></div>
+    </section>
+
+    <section class="section card" id="rapids">
+      <h2 class="section-title">۱۵. چرا سراغ RAPIDS و cuML می‌رویم؟</h2>
+      <p>بخش دوم جلسه از الگوریتم به زیرساخت می‌رسد. بعضی Datasetها یا مدل‌ها روی CPU زمان زیادی می‌گیرند. RAPIDS مجموعه‌ای از Libraryهای Data Science مبتنی بر CUDA است و cuML APIهایی نزدیک به scikit-learn برای اجرای GPU فراهم می‌کند.</p>
+      <div class="grid3"><div class="mini"><strong>CPU</strong><p>تعداد Core کمتر اما انعطاف بالا؛ برای دادهٔ کوچک و بسیاری از Workflowها ساده و کافی است.</p></div><div class="mini"><strong>GPU</strong><p>هزاران واحد محاسباتی برای کارهای موازی؛ وقتی الگوریتم و داده مناسب باشند سرعت قابل‌توجهی می‌دهد.</p></div><div class="mini"><strong>VRAM</strong><p>داده و Model باید در حافظهٔ GPU جا شوند. GPU همیشه و برای هر اندازهٔ داده سریع‌تر نیست.</p></div></div>
+      <p>Notebook روی Google Colab نصب RAPIDS را انجام داده و خروجی <code>nvidia-smi</code> یک Tesla T4 با حدود ۱۵ گیگابایت حافظه را نشان می‌دهد. نسخهٔ ذخیره‌شدهٔ cuML نیز <code>26.02.000</code> است.</p>
+      <div class="note danger"><strong>محیط قابل حمل نیست:</strong> Cellهای نصب به Colab، Linux، CUDA و دسترسی شبکه وابسته‌اند. اجرای مستقیم همان Notebook در Windows محلی یا بدون GPU تضمین‌شده نیست.</div>
+    </section>
+
+    <section class="section card" id="mnist">
+      <h2 class="section-title">۱۶. SVC روی MNIST با cuML</h2>
+      <p>Notebook با <code>fetch_openml("mnist_784")</code> دادهٔ MNIST را می‌گیرد: ۷۰٬۰۰۰ تصویر تخت‌شده با ۷۸۴ Feature. سپس <code>cuml.svm.SVC</code> روی کل X و y Fit می‌شود تا نمونه‌ای از اجرای سنگین‌تر روی GPU دیده شود.</p>
+      <pre data-file="cuml_mnist.py" data-summary="کد ذخیره‌شدهٔ اجرای SVC روی GPU" data-highlight="1,4,6">from cuml.svm import SVC
+from sklearn.datasets import fetch_openml
+
+X, y = fetch_openml("mnist_784", return_X_y=True)
+clf = SVC()
+clf.fit(X, y)</pre>
+      <div class="note warn"><strong>این Cell فقط Fit را نشان می‌دهد:</strong> Train/test split، Scaling، Metric، زمان‌سنجی CPU/GPU و ارزیابی روی دادهٔ ندیده در Notebook ذخیره نشده‌اند؛ پس از آن نمی‌توان نتیجهٔ دقت یا برتری سرعت استخراج کرد.</div>
+      <div class="note info"><strong>انتقال داده هم هزینه دارد:</strong> اگر داده کوچک باشد، زمان آماده‌سازی و جابه‌جایی بین RAM و VRAM ممکن است سود GPU را کم کند. Benchmark باید کل Workflow را اندازه بگیرد، نه فقط یک خط Fit.</div>
+      <p>در فایل یادداشت <code>datasets</code> ترکیب <code>sklearn.model_selection.GridSearchCV</code> با <code>cuml.svm.SVC</code> هم ثبت شده است؛ این اشاره بر شباهت APIها تکیه دارد، اما Grid Search واقعی و خروجی آن در فایل‌های جلسه ذخیره نشده است.</p>
+    </section>
+
+    <section class="section card" id="kaggle">
+      <h2 class="section-title">۱۷. دریافت Dataset از Kaggle در Colab</h2>
+      <p>برای نمونهٔ دادهٔ تصویری، Notebook روش نصب Kaggle CLI، قراردادن <code>kaggle.json</code> در مسیر تنظیمات، تنظیم Permission و دانلود Caltech-101 را نشان می‌دهد.</p>
+      <pre data-file="colab_kaggle.sh" data-summary="مراحل ذخیره‌شده برای Kaggle CLI" data-highlight="2,4,5">pip install kaggle
+mkdir ~/.kaggle
+cp kaggle.json ~/.kaggle/
+chmod 600 ~/.kaggle/kaggle.json
+kaggle datasets download -d imbikramsaha/caltech-101
+unzip caltech-101.zip</pre>
+      <div class="note danger"><strong>Credential را Commit نکن:</strong> فایل <code>kaggle.json</code> شامل Token شخصی است. باید خارج از Git نگه‌داری شود و در صورت افشاشدن Token از حساب Kaggle باطل و دوباره ساخته شود.</div>
+      <p>فایل متنی <code>datasets</code> علاوه بر Feature Importance، لینک Heart Disease، Bank Marketing و Adult Income را هم به‌عنوان Datasetهای پیشنهادی ثبت کرده است؛ در این جلسه Pipeline کامل آموزشی روی آن‌ها ساخته نشده است.</p>
+    </section>
+
+    <section class="section card" id="pixels">
+      <h2 class="section-title">۱۸. تصویر دیجیتال یعنی Array عددی</h2>
+      <p>در OpenCV، تصویر رنگی معمولاً Array سه‌بعدی است: ارتفاع × عرض × Channel. فایل <code>download.png</code> جلسه ۲۵۶×۲۵۶ پیکسل و سه Channel دارد. مقدار هر Channel در تصویر ۸بیتی معمولاً بین ۰ تا ۲۵۵ است.</p>
+      <div class="grid3"><div class="channel-card blue"><div><b>B</b><p>Blue channel</p></div></div><div class="channel-card green"><div><b>G</b><p>Green channel</p></div></div><div class="channel-card red"><div><b>R</b><p>Red channel</p></div></div></div>
+      <div class="pixel-grid" aria-label="نمایش شماتیک شدت پیکسل‌ها"><span style="--p:20,20,20"></span><span style="--p:35,35,35"></span><span style="--p:50,50,50"></span><span style="--p:70,70,70"></span><span style="--p:95,95,95"></span><span style="--p:120,120,120"></span><span style="--p:160,160,160"></span><span style="--p:210,210,210"></span><span style="--p:20,20,20"></span><span style="--p:35,35,35"></span><span style="--p:50,50,50"></span><span style="--p:70,70,70"></span><span style="--p:95,95,95"></span><span style="--p:120,120,120"></span><span style="--p:160,160,160"></span><span style="--p:210,210,210"></span><span style="--p:20,20,20"></span><span style="--p:35,35,35"></span><span style="--p:50,50,50"></span><span style="--p:70,70,70"></span><span style="--p:95,95,95"></span><span style="--p:120,120,120"></span><span style="--p:160,160,160"></span><span style="--p:210,210,210"></span><span style="--p:20,20,20"></span><span style="--p:35,35,35"></span><span style="--p:50,50,50"></span><span style="--p:70,70,70"></span><span style="--p:95,95,95"></span><span style="--p:120,120,120"></span><span style="--p:160,160,160"></span><span style="--p:210,210,210"></span><span style="--p:20,20,20"></span><span style="--p:35,35,35"></span><span style="--p:50,50,50"></span><span style="--p:70,70,70"></span><span style="--p:95,95,95"></span><span style="--p:120,120,120"></span><span style="--p:160,160,160"></span><span style="--p:210,210,210"></span><span style="--p:20,20,20"></span><span style="--p:35,35,35"></span><span style="--p:50,50,50"></span><span style="--p:70,70,70"></span><span style="--p:95,95,95"></span><span style="--p:120,120,120"></span><span style="--p:160,160,160"></span><span style="--p:210,210,210"></span><span style="--p:20,20,20"></span><span style="--p:35,35,35"></span><span style="--p:50,50,50"></span><span style="--p:70,70,70"></span><span style="--p:95,95,95"></span><span style="--p:120,120,120"></span><span style="--p:160,160,160"></span><span style="--p:210,210,210"></span><span style="--p:20,20,20"></span><span style="--p:35,35,35"></span><span style="--p:50,50,50"></span><span style="--p:70,70,70"></span><span style="--p:95,95,95"></span><span style="--p:120,120,120"></span><span style="--p:160,160,160"></span><span style="--p:210,210,210"></span></div>
+      <div class="note info"><strong>BGR در برابر RGB:</strong> <code>cv2.imread</code> تصویر رنگی را با ترتیب BGR می‌خواند، اما Matplotlib معمولاً RGB انتظار دارد. برای نمایش درست باید از <code>cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)</code> استفاده شود.</div>
+    </section>
+
+    <section class="section card" id="opencv">
+      <h2 class="section-title">۱۹. از خواندن تصویر تا Gray، Edge و Resize</h2>
+      <p>Script اول چند تبدیل پایه را کنار هم می‌گذارد: خواندن تصویر، تبدیل به Grayscale، پیداکردن Edge با Canny و تغییر اندازه. این‌ها مرحله‌های Feature Engineering یا آماده‌سازی ورودی در مسائل Computer Vision هستند؛ خودشان یک Classifier کامل نیستند.</p>
+      <pre data-file="opencv_image.py" data-summary="عملیات اصلی فایل 01.py" data-highlight="3,4,5,9,10,11">import cv2
+
+bgr_img = cv2.imread("download.png")
+gray = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2GRAY)
+edges = cv2.Canny(gray, 50, 150, apertureSize=3)
+
+print(bgr_img.shape)       # (256, 256, 3)
+print(cv2.pyrUp(bgr_img).shape)    # (512, 512, 3)
+print(cv2.pyrDown(bgr_img).shape)  # (128, 128, 3)
+resized = cv2.resize(gray, (512, 512),
+                     interpolation=cv2.INTER_AREA)</pre>
+      <div class="grid3"><div class="mini"><strong>Grayscale</strong><p>سه Channel رنگی را به یک شدت روشنایی تبدیل می‌کند؛ شکل Array دوبعدی می‌شود.</p></div><div class="mini"><strong>Canny</strong><p>با دو Threshold، تغییرات شدید شدت را به‌عنوان Edge استخراج می‌کند. خروجی این مثال تصویری Binaryمانند است.</p></div><div class="mini"><strong>Resize / Pyramid</strong><p><code>resize</code> اندازهٔ دقیق می‌گیرد؛ <code>pyrUp</code> و <code>pyrDown</code> با فیلتر هر بعد را تقریباً دوبرابر یا نصف می‌کنند.</p></div></div>
+      <div class="note warn"><strong>ترتیب Size در OpenCV:</strong> شکل Array به صورت <bdi>(height, width, channels)</bdi> است، اما آرگومان <code>cv2.resize</code> به صورت <bdi>(width, height)</bdi> نوشته می‌شود.</div>
+    </section>
+
+    <section class="section card" id="video">
+      <h2 class="section-title">۲۰. فریم‌های Webcam با VideoCapture</h2>
+      <p>Script دوم به‌جای یک فایل ثابت، از Camera شمارهٔ صفر فریم می‌گیرد. هر فریم همان Array تصویری است؛ بنابراین تبدیل Gray و Canny روی آن هم اجرا می‌شود. Loop با کلید Escape، یعنی کد ۲۷، متوقف می‌شود.</p>
+      <pre data-file="opencv_webcam.py" data-summary="Loop فایل 02.py برای ورودی زنده" data-highlight="3,6,8,12,15,18">import cv2
+
+capture = cv2.VideoCapture(0)
+
+while True:
+    ok, bgr_frame = capture.read()
+    if not ok:
+        break
+    gray = cv2.cvtColor(bgr_frame, cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(gray, 50, 150, apertureSize=3)
+
+    cv2.imshow("Image", bgr_frame)
+    cv2.imshow("Gray", gray)
+    cv2.imshow("Edges", edges)
+
+    if cv2.waitKey(1) == 27:
+        break
+
+capture.release()
+cv2.destroyAllWindows()</pre>
+      <div class="note info"><strong>اصلاح کوچک نسبت به Script جلسه:</strong> مقدار Boolean برگشتی از <code>read</code> اینجا بررسی شده است. اگر Camera باز نشود یا فریمی نرسد، تبدیل رنگ روی <code>None</code> خطا می‌دهد؛ پس این Guard لازم است.</div>
+    </section>
+
+    <section class="section card" id="file-notes">
+      <h2 class="section-title">۲۱. دام‌ها و نکات اجرای فایل‌های جلسه</h2>
+      <div class="table-wrap"><table><thead><tr><th>فایل / بخش</th><th>مشاهده</th><th>برداشت درست</th></tr></thead><tbody><tr><td><code>01.ipynb</code></td><td>مدل روی کل X Fit و روی همان X ارزیابی شده؛ Report برابر ۱٫۰۰ است.</td><td>این Training Score است. قبل از Fit، train/test یا Cross-Validation لازم است.</td></tr><tr><td><code>01.ipynb</code></td><td><code>random_state</code> تنظیم نشده است.</td><td>ساختار Tree و Feature Importance در Tieها ممکن است تکرارپذیر نباشد.</td></tr><tr><td>LogisticRegression</td><td>خروجی ذخیره‌شده <code>ConvergenceWarning</code> دارد.</td><td>Scaling، افزایش <code>max_iter</code> و بررسی Solver لازم است؛ Coefficient ناپایدار را تفسیر نکن.</td></tr><tr><td><code>CustomTree</code></td><td>کلاس از <code>BaseEstimator</code> و <code>BaseDecisionTree</code> هم‌زمان ارث می‌برد.</td><td>اجرای تمیز به خطای MRO می‌رسد؛ <code>BaseDecisionTree</code> خودش در زنجیرهٔ ارث‌بری BaseEstimator را دارد و API داخلی است.</td></tr><tr><td><code>ML_06.ipynb</code></td><td>Cellهای نصب و Kaggle به Colab/Linux/Network و Credential وابسته‌اند.</td><td>Notebook محلی self-contained نیست و نباید Token داخل Repository قرار بگیرد.</td></tr><tr><td>SVC روی MNIST</td><td>فقط Fit روی کل داده انجام شده است.</td><td>هیچ Metric یا Benchmark CPU/GPU در فایل ثبت نشده؛ نتیجه‌ای دربارهٔ دقت یا Speedup نده.</td></tr><tr><td><code>01.py</code></td><td><code>cv2.imshow</code> به محیط GUI نیاز دارد.</td><td>در Notebook Headless/Colab باید از روش نمایش سازگار با همان محیط استفاده شود.</td></tr><tr><td><code>02.py</code></td><td>نسخهٔ اصلی نتیجهٔ <code>capture.read()</code> را نادیده می‌گیرد.</td><td>قبل از پردازش، Boolean موفقیت خواندن فریم را بررسی کن.</td></tr></tbody></table></div>
+      <div class="note ok"><strong>روال بازبینی پیشنهادی:</strong> Kernel را Restart کن، از بالا Run All بزن، Split و Seed را مشخص کن، Warningها را بخوان و فقط نتیجه‌ای را گزارش کن که روی دادهٔ ندیده و با محیط قابل تکرار به دست آمده است.</div>
+    </section>
+
+    <section class="section card quiz" id="review">
+      <h2 class="section-title">۲۲. خودآزمایی جلسه</h2>
+      <details><summary>چرا Decision Tree را مدل قابل تفسیر می‌دانیم؟</summary><p>چون Prediction یک نمونه را می‌توان به مسیر مشخصی از شرط‌های Root تا Leaf نسبت داد. البته درخت خیلی عمیق هنوز سخت‌خوان و مستعد Overfitting است.</p></details>
+      <details><summary>Candidate Threshold برای Feature عددی چطور ساخته می‌شود؟</summary><p>مقدارهای متمایز مرتب می‌شوند و نقطه‌های میانی بین مقدارهای متوالی بررسی می‌شوند. سپس Impurity وزنی Childها برای هر Candidate محاسبه می‌شود.</p></details>
+      <details><summary>Impurity صفر چه معنی دارد؟</summary><p>همهٔ نمونه‌های Node از یک Class هستند. آن Node خالص است و از دید Classification جداسازی بیشتری لازم ندارد.</p></details>
+      <details><summary>فرق min_samples_split و min_samples_leaf چیست؟</summary><p>اولی می‌گوید Node برای اینکه اصلاً Split شود حداقل چند نمونه لازم دارد؛ دومی حداقل تعداد نمونه‌ای است که باید بعد از Split در هر Leaf باقی بماند.</p></details>
+      <details><summary>چرا Report برابر ۱٫۰۰ در Notebook کافی نیست؟</summary><p>چون پیش‌بینی روی همان X انجام شده که مدل با آن Fit شده است. باید عملکرد روی دادهٔ دیده‌نشده سنجیده شود.</p></details>
+      <details><summary>فرق BGR و RGB در این مثال چیست؟</summary><p>OpenCV تصویر را BGR می‌خواند، اما Matplotlib RGB نمایش می‌دهد. بدون تبدیل، Channel قرمز و آبی جابه‌جا دیده می‌شوند.</p></details>
+      <details><summary>آیا اجرای GPU به‌تنهایی ثابت می‌کند Model بهتر است؟</summary><p>نه. GPU فقط زیرساخت محاسبه است. کیفیت مدل با Evaluation سنجیده می‌شود و سرعت هم باید با Benchmark منصفانهٔ کل Workflow اندازه‌گیری شود.</p></details>
+    </section>
+
+    <section class="section card" id="glossary">
+      <h2 class="section-title">واژه‌نامهٔ سریع</h2>
+      <div class="table-wrap"><table><thead><tr><th>اصطلاح</th><th>معنای ساده</th></tr></thead><tbody><tr><td>Root</td><td>اولین Node که همهٔ Sampleها از آن وارد Tree می‌شوند.</td></tr><tr><td>Leaf</td><td>Node نهایی که Prediction را نگه می‌دارد.</td></tr><tr><td>Split</td><td>تقسیم نمونه‌های یک Node با شرط Feature و Threshold.</td></tr><tr><td>Threshold</td><td>مرز عددی شرط، مثل <bdi>petal length ≤ 2.45</bdi>.</td></tr><tr><td>Impurity</td><td>میزان مخلوط‌بودن Classها در یک Node.</td></tr><tr><td>Gini</td><td>معیار پیش‌فرض ناخالصی در DecisionTreeClassifier.</td></tr><tr><td>Entropy</td><td>معیار عدم قطعیت توزیع Classها.</td></tr><tr><td>Pruning</td><td>محدود یا حذف‌کردن شاخه‌های کم‌ارزش برای کنترل Complexity.</td></tr><tr><td>Feature Importance</td><td>سهم نسبی Feature در کاهش Impurity همان Model.</td></tr><tr><td>RAPIDS / cuML</td><td>ابزارهای Data Science و Machine Learning مبتنی بر CUDA/GPU.</td></tr><tr><td>Channel</td><td>یک مؤلفهٔ تصویر رنگی؛ در OpenCV معمولاً B، G و R.</td></tr><tr><td>Edge</td><td>در Graph اتصال دو Node؛ در پردازش تصویر مرز ناشی از تغییر شدید شدت.</td></tr></tbody></table></div>
+      <div class="note ok"><strong>جمع‌بندی:</strong> Decision Tree با Splitهای کوچک و قابل‌ردگیری یک قانون پیچیده می‌سازد؛ کیفیت هر Split را با کاهش Impurity می‌سنجد و برای تعمیم به محدودیت رشد و Evaluation واقعی نیاز دارد. اجرای GPU محاسبه را شتاب می‌دهد، اما جای Evaluation را نمی‌گیرد؛ و در OpenCV هر تصویر و فریم در نهایت Arrayی از عددهاست که می‌توان آن را تبدیل و تحلیل کرد.</div>
+    </section>
+  </main></div>
+  <a class="back" href="#start" aria-label="بازگشت به بالا">↑</a>
+  <dialog id="search-dialog" aria-labelledby="search-title"><div class="search-box"><label id="search-title" for="search-input">جستجو</label><input class="search-input" id="search-input" type="search" autocomplete="off" placeholder="مثلاً Entropy، max_depth، cuML یا Canny"><button class="close-search" id="close-search" type="button" aria-label="بستن جستجو">Esc</button></div><ul class="search-results" id="search-results" aria-live="polite"></ul></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+  const root=document.documentElement, body=document.body, sidebar=$("#sidebar"), overlay=$("#drawer-overlay"), menu=$("#menu-button"), toast=$("#toast");
+  let toastTimer;
+  const showToast=text=>{toast.textContent=text;toast.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove("show"),1700)};
+  const storedTheme=localStorage.getItem("ml-doc-theme");
+  const preferred=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";
+  const setTheme=theme=>{root.dataset.theme=theme;$("#theme-toggle").setAttribute("aria-label",theme==="dark"?"فعال‌کردن پوستهٔ روشن":"فعال‌کردن پوستهٔ تیره")};
+  setTheme(storedTheme||preferred);
+  $("#theme-toggle").addEventListener("click",()=>{const next=root.dataset.theme==="dark"?"light":"dark";setTheme(next);localStorage.setItem("ml-doc-theme",next);showToast(next==="dark"?"پوستهٔ تیره فعال شد":"پوستهٔ روشن فعال شد")});
+  const setDrawer=open=>{sidebar.classList.toggle("open",open);overlay.classList.toggle("show",open);body.classList.toggle("drawer-open",open);menu.setAttribute("aria-expanded",String(open));if(open)sidebar.focus()};
+  menu.addEventListener("click",()=>setDrawer(!sidebar.classList.contains("open")));overlay.addEventListener("click",()=>setDrawer(false));
+  $$(".sidebar a").forEach(a=>a.addEventListener("click",()=>setDrawer(false)));addEventListener("keydown",e=>{if(e.key==="Escape"&&sidebar.classList.contains("open"))setDrawer(false)});
+
+  const sections=[$("#start"),...$$("main section[id]")].filter(Boolean);
+  sections.forEach((section,index)=>{
+    const heading=$("h1,h2",section); if(!heading)return;
+    if(heading.tagName==="H2"){const wrap=document.createElement("div");wrap.className="section-heading";heading.before(wrap);wrap.append(heading);const button=document.createElement("button");button.className="permalink";button.type="button";button.textContent="#";button.setAttribute("aria-label","کپی لینک این بخش");button.addEventListener("click",()=>copyLink(section.id));wrap.append(button)}
+    if(section.classList.contains("hero"))return;
+    const nav=document.createElement("nav");nav.className="section-nav";nav.setAttribute("aria-label","پیمایش بین بخش‌ها");const prev=sections[index-1],next=sections[index+1];nav.innerHTML=`${prev?`<a href="#${prev.id}">→ ${$("h1,h2",prev)?.textContent||"قبلی"}</a>`:"<span></span>"}<span class="related"></span>${next?`<a class="next" href="#${next.id}">${$("h1,h2",next)?.textContent||"بعدی"} ←</a>`:"<span></span>"}`;section.append(nav)
+  });
+  $$("main h3").forEach((heading,index)=>{if(!heading.id)heading.id=`subtopic-${index+1}`;const wrap=document.createElement("div");wrap.className="sub-heading";heading.before(wrap);wrap.append(heading);const button=document.createElement("button");button.className="permalink";button.type="button";button.textContent="#";button.setAttribute("aria-label","کپی لینک این زیربخش");button.addEventListener("click",()=>copyLink(heading.id));wrap.append(button)});
+  async function copyLink(id){const url=location.href.split("#")[0]+"#"+id;try{await navigator.clipboard.writeText(url);showToast("لینک بخش کپی شد")}catch{location.hash=id}}
+
+  $$("pre").forEach((pre,index)=>{
+    if(pre.closest(".code-block"))return;
+    const section=pre.closest("section");
+    const file=pre.dataset.file||`example-${String(index+1).padStart(2,"0")}.py`;
+    const summaryText=pre.dataset.summary||"نمایش نمونه‌کد";
+    const highlighted=(pre.dataset.highlight||"").split(",").map(Number).filter(Boolean);
+    const raw=pre.textContent.replace(/^\s*\n|\n\s*$/g,"");
+    const code=document.createElement("code");
+    raw.split("\n").forEach((value,lineIndex)=>{const line=document.createElement("span");line.className="line"+(highlighted.includes(lineIndex+1)?" hl":"");line.dataset.line=String(lineIndex+1);line.textContent=value;code.append(line)});
+    pre.replaceChildren(code);
+    const figure=document.createElement("figure");figure.className="code-block";figure.dataset.code="";
+    const caption=document.createElement("figcaption");caption.className="code-head";caption.innerHTML=`<span class="code-file">${file}</span><span class="code-language">Python</span><button class="copy-code" type="button" aria-label="کپی کد ${file}">Copy</button>`;
+    pre.before(figure);figure.append(caption,pre);
+    const details=document.createElement("details");details.className="code-disclosure";details.open=pre.dataset.open==="true";
+    const summary=document.createElement("summary");summary.textContent=summaryText;figure.before(details);details.append(summary,figure);
+    caption.querySelector("button").addEventListener("click",async()=>{const value=$$(".line",figure).map(x=>x.textContent).join("\n");try{await navigator.clipboard.writeText(value);showToast("کد کپی شد")}catch{showToast("کپی خودکار در این مرورگر ممکن نیست")}});
+    if(section)section.dataset.hasCode="true"
+  });
+  $$(".table-wrap").forEach((wrap,index)=>{const rows=wrap.querySelectorAll("tbody tr").length;if(rows<6||wrap.closest("details"))return;const details=document.createElement("details");details.className="table-disclosure";details.open=index===0;const summary=document.createElement("summary");summary.textContent=`نمایش جدول کامل (${rows} ردیف)`;wrap.before(details);details.append(summary,wrap)});
+
+  const tocLinks=$$(".toc"), tocById=new Map(tocLinks.map(a=>[a.getAttribute("href").slice(1),a]));
+  const activate=id=>{tocLinks.forEach(a=>a.removeAttribute("aria-current"));const link=tocById.get(id);if(link){link.setAttribute("aria-current","true");link.closest("details")?.setAttribute("open","")}};
+  const observer=new IntersectionObserver(entries=>{const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top)[0];if(visible)activate(visible.target.id)},{rootMargin:"-18% 0px -65% 0px",threshold:[0,.2,.5]});sections.forEach(s=>observer.observe(s));activate("start");
+
+  const dialog=$("#search-dialog"), input=$("#search-input"), results=$("#search-results");
+  const normalize=s=>(s||"").toLocaleLowerCase("fa").replace(/[ي]/g,"ی").replace(/[ك]/g,"ک").replace(/\s+/g," ").trim();
+  const index=sections.map(s=>({id:s.id,title:$("h1,h2",s)?.textContent||s.id,text:normalize(s.textContent)}));
+  const render=q=>{const n=normalize(q);const found=(n?index.filter(x=>x.text.includes(n)):index.slice(0,8)).slice(0,12);results.innerHTML="";if(!found.length){results.innerHTML='<li class="search-empty">نتیجه‌ای پیدا نشد؛ عبارت کوتاه‌تری امتحان کن.</li>';return}found.forEach(item=>{const li=document.createElement("li"),a=document.createElement("a");a.href="#"+item.id;a.innerHTML=`<span class="result-title">${item.title}</span><span class="result-snippet">رفتن مستقیم به این بخش</span>`;a.addEventListener("click",()=>dialog.close());li.append(a);results.append(li)})};
+  const openSearch=()=>{render(input.value);dialog.showModal();input.focus()};
+  $("#search-trigger").addEventListener("click",openSearch);$("#close-search").addEventListener("click",()=>dialog.close());input.addEventListener("input",()=>render(input.value));
+  addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();dialog.open?dialog.close():openSearch()}if(e.key==="Escape"&&dialog.open)dialog.close()});
+
+  $$('[data-tabs]').forEach((tabs,tabsIndex)=>{
+    const buttons=$$('[role="tab"]',tabs),panels=$$('[role="tabpanel"]',tabs);
+    const activate=button=>{const name=button.dataset.tab;buttons.forEach(b=>{const active=b===button;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1});panels.forEach(panel=>{panel.hidden=panel.dataset.panel!==name})};
+    buttons.forEach((button,index)=>{if(!button.id)button.id=`tabs-${tabsIndex+1}-tab-${index+1}`;const panel=panels.find(p=>p.dataset.panel===button.dataset.tab);if(panel){if(!panel.id)panel.id=`tabs-${tabsIndex+1}-panel-${index+1}`;button.setAttribute('aria-controls',panel.id);panel.setAttribute('aria-labelledby',button.id)}button.addEventListener('click',()=>activate(button));button.addEventListener('keydown',event=>{if(!['ArrowRight','ArrowLeft','Home','End'].includes(event.key))return;event.preventDefault();let next=index;if(event.key==='ArrowRight')next=(index-1+buttons.length)%buttons.length;if(event.key==='ArrowLeft')next=(index+1)%buttons.length;if(event.key==='Home')next=0;if(event.key==='End')next=buttons.length-1;activate(buttons[next]);buttons[next].focus()})});
+    activate(buttons.find(b=>b.getAttribute('aria-selected')==='true')||buttons[0]);
+  });
+})();
+</script>
+</body>
+</html>

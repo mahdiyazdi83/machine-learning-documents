@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="fa" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>یادگیری ماشین — جلسهٔ ۵ | Logistic Regression، Pipeline و SVM</title>
+  <meta name="description" content="مستند توضیحی و کتابی جلسهٔ پنجم یادگیری ماشین: Classification، Logistic Regression، Probability، Cross-Entropy، Pipeline، SVM، Kernel و Caltech101">
+  <style>
+:root{color-scheme:dark;--bg:#07101f;--surface:#101c31;--surface-2:#172640;--surface-3:#1c2f4e;--line:#2b4365;--text:#d6e2f2;--heading:#fff;--muted:#9fb0c6;--brand:#52d6ee;--brand-strong:#22aeca;--amber:#f7c95c;--ok:#79e6a3;--danger:#ff9cad;--violet:#c9b7ff;--focus:#ffe16b;--overlay:rgba(2,7,18,.76);--shadow:0 18px 46px rgba(0,0,0,.28);--radius:1rem;--radius-sm:.65rem;--content:960px;--side:292px}
+html[data-theme="light"]{color-scheme:light;--bg:#eef4fb;--surface:#fff;--surface-2:#edf4fb;--surface-3:#e2edf8;--line:#bfd0e3;--text:#26374b;--heading:#0c1c31;--muted:#597087;--brand:#087f9b;--brand-strong:#066a83;--amber:#9b6100;--ok:#17643a;--danger:#a91e3a;--violet:#6b42b8;--focus:#8a5a00;--overlay:rgba(12,28,49,.5);--shadow:0 15px 36px rgba(35,65,95,.12)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:5.5rem}body{margin:0;background:linear-gradient(145deg,var(--bg),color-mix(in srgb,var(--bg) 86%,var(--brand)));color:var(--text);font-family:Vazirmatn,Vazir,Tahoma,Arial,sans-serif;line-height:1.95}body.drawer-open{overflow:hidden}a{color:inherit}button,input{font:inherit}button{cursor:pointer}h1,h2,h3,h4,strong{color:var(--heading)}code,bdi,.ltr,pre{direction:ltr;unicode-bidi:isolate}code{background:var(--surface-3);color:var(--brand);padding:.1rem .4rem;border-radius:.38rem;font:inherit;font-size:.9em}:focus-visible{outline:3px solid var(--focus);outline-offset:3px}.skip-link{position:fixed;z-index:120;top:.5rem;right:.5rem;transform:translateY(-160%);padding:.55rem .9rem;border-radius:var(--radius-sm);background:var(--heading);color:var(--bg)}.skip-link:focus{transform:none}
+.appbar{position:sticky;top:0;z-index:50;height:4.25rem;display:flex;align-items:center;gap:.65rem;padding:.65rem max(1rem,calc((100vw - 1400px)/2));background:color-mix(in srgb,var(--bg) 88%,transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.brand{margin-inline-end:auto;color:var(--heading);font-weight:900}.icon-btn,.search-trigger{min-height:2.7rem;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);padding:.45rem .75rem}.menu-btn{display:none}.search-trigger{display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-width:235px}.shortcut{border:1px solid var(--line);border-bottom-width:2px;border-radius:.35rem;padding:.05rem .42rem;color:var(--muted);font-size:.76rem}
+.layout{max-width:1400px;margin:auto;display:grid;grid-template-columns:var(--side) minmax(0,var(--content));gap:2rem;padding:2rem}.sidebar{position:sticky;top:5.55rem;align-self:start;max-height:calc(100vh - 7rem);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow)}.side-title{font-weight:950;color:var(--heading);padding:.25rem .65rem .7rem}.nav-group{border-top:1px solid var(--line);padding:.35rem 0}.nav-group summary{cursor:pointer;color:var(--heading);font-weight:850;padding:.4rem .65rem;border-radius:var(--radius-sm)}.nav-group summary:hover{background:var(--surface-2)}.toc{display:block;text-decoration:none;color:var(--muted);padding:.34rem .7rem;border-radius:.5rem;font-size:.82rem;line-height:1.55;border-right:3px solid transparent}.toc:hover{background:var(--surface-2);color:var(--brand)}.toc[aria-current="true"]{background:color-mix(in srgb,var(--brand) 15%,transparent);color:var(--brand);border-right-color:var(--brand);font-weight:900}.source-note{border-top:1px solid var(--line);margin-top:.7rem;padding:.85rem .65rem 0;color:var(--muted);font-size:.73rem}
+main{min-width:0;display:flex;flex-direction:column;gap:1.5rem;padding-bottom:6rem}.hero,.section{border:1px solid var(--line);box-shadow:var(--shadow)}.hero{position:relative;overflow:hidden;border-radius:1.45rem;padding:4.3rem 3rem;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--brand) 24%,transparent),transparent 35%),radial-gradient(circle at 92% 100%,color-mix(in srgb,var(--amber) 15%,transparent),transparent 34%),var(--surface)}.eyebrow,.chip{display:inline-flex;border:1px solid color-mix(in srgb,var(--brand) 55%,var(--line));background:color-mix(in srgb,var(--brand) 13%,transparent);color:var(--brand);border-radius:999px;padding:.2rem .72rem;font-size:.8rem;font-weight:850}.hero h1{font-size:clamp(2.2rem,5vw,4rem);line-height:1.42;margin:1.2rem 0 .7rem;max-width:830px}.hero p{font-size:1.06rem;max-width:800px;color:var(--muted)}.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.5rem}.section{background:var(--surface);border-radius:var(--radius);padding:2rem}.section p{margin:.4rem 0 1.1rem}.section-title{font-size:clamp(1.4rem,3vw,1.95rem);font-weight:950;margin:0}.section-heading,.sub-heading{display:flex;align-items:flex-start;gap:.55rem;border-bottom:1px solid var(--line);padding-bottom:.8rem;margin:0 0 1.2rem}.sub-heading{margin-top:1.7rem}.sub{color:var(--brand);font-size:1.18rem;margin:0}.permalink{flex:0 0 auto;border:0;background:transparent;color:var(--muted);border-radius:.35rem;padding:.12rem .38rem}.permalink:hover{background:var(--surface-2);color:var(--brand)}
+.grid2,.grid3,.grid4{display:grid;gap:1rem}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid4{grid-template-columns:repeat(4,minmax(0,1fr))}.mini,.record{border:1px solid var(--line);background:var(--surface-2);border-radius:.8rem;padding:1rem;transition:transform .16s,border-color .16s}.mini:hover,.record:hover{transform:translateY(-2px);border-color:var(--brand)}.mini p,.record p{margin:.3rem 0 0}.note{border-right:4px solid;padding:1rem 1.15rem;border-radius:.72rem;margin:1.2rem 0}.info{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 15%,var(--surface));color:var(--text)}.warn{border-color:var(--amber);background:color-mix(in srgb,var(--amber) 15%,var(--surface));color:var(--text)}.danger{border-color:var(--danger);background:color-mix(in srgb,var(--danger) 14%,var(--surface));color:var(--text)}.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--surface));color:var(--text)}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:.8rem;margin:1.2rem 0}table{width:100%;min-width:660px;border-collapse:collapse;text-align:right;font-size:.9rem}th{background:var(--surface-3);color:var(--heading)}th,td{padding:.72rem .85rem;border-bottom:1px solid var(--line);vertical-align:top}tr:nth-child(even) td{background:color-mix(in srgb,var(--surface-2) 60%,transparent)}.table-disclosure,.code-disclosure{border:1px solid var(--line);border-radius:.8rem;margin:.85rem 0;background:var(--surface-2);overflow:hidden}.table-disclosure>summary,.code-disclosure>summary{cursor:pointer;padding:.8rem 1rem;color:var(--heading);font-weight:850}.table-disclosure[open]>summary,.code-disclosure[open]>summary{border-bottom:1px solid var(--line)}.code-disclosure>summary:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--focus);border-radius:.55rem}.table-disclosure>.table-wrap{margin:0;border-inline:0;border-bottom:0;border-radius:0}.code-disclosure>.code-block{margin:1rem}
+.code-block{margin:1rem 0;border:1px solid var(--line);border-radius:.82rem;overflow:hidden;background:#020617;color:#e2e8f0;direction:ltr;box-shadow:0 10px 28px rgba(0,0,0,.16)}.code-head{display:flex;align-items:center;gap:.6rem;padding:.48rem .7rem;background:#111827;border-bottom:1px solid #334155;color:#94a3b8;font:600 .78rem/1.5 Consolas,monospace}.code-file{color:#e2e8f0;font-weight:700}.code-language{margin-left:auto;color:#67e8f9}.copy-code{border:1px solid #334155;background:#172033;color:#e2e8f0;border-radius:.4rem;padding:.25rem .55rem}.copy-code:hover{border-color:#67e8f9;color:#67e8f9}.code-block pre{margin:0;border:0;border-radius:0;padding:.9rem 0;overflow:auto;background:#020617;color:#e2e8f0;line-height:1.65;tab-size:4}.code-block code{display:block;background:none;padding:0;color:inherit;font:400 .82rem/1.65 Consolas,monospace}.line{display:block;padding:0 1rem;white-space:pre}.line::before{content:attr(data-line);display:inline-block;width:2.1rem;margin-right:.8rem;color:#475569;text-align:right;user-select:none}.line.hl{background:rgba(251,191,36,.1);border-left:3px solid #fbbf24}.equation{direction:ltr;unicode-bidi:isolate;overflow:auto;text-align:center;font:700 .94rem/1.85 Consolas,monospace;color:var(--brand);background:var(--surface-2);border:1px solid var(--line);border-radius:.75rem;padding:1rem;margin:1.2rem 0}
+.flow{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:.42rem;align-items:center;margin:1.2rem 0}.flow .box{text-align:center;padding:.8rem;border:1px solid color-mix(in srgb,var(--brand) 55%,var(--line));background:color-mix(in srgb,var(--brand) 10%,var(--surface));border-radius:.65rem;color:var(--brand);font-weight:850}.flow .arrow{text-align:center;color:var(--brand)}.diagram{direction:ltr;unicode-bidi:isolate;background:color-mix(in srgb,var(--bg) 82%,black);border:1px solid var(--line);border-radius:1rem;padding:1.15rem;margin:1.25rem 0;overflow:hidden}.diagram-title{direction:rtl;text-align:right;color:var(--heading);font-weight:900;margin-bottom:.75rem}.diagram small{direction:rtl;display:block;color:var(--muted);text-align:center;margin-top:.55rem}.diagram svg{display:block;width:100%;height:auto;max-height:420px}.diagram text{font-family:Tahoma,Arial,sans-serif}.cm{direction:ltr;display:grid;grid-template-columns:90px repeat(2,minmax(110px,1fr));grid-template-rows:55px repeat(2,110px);gap:.55rem;max-width:620px;margin:1.3rem auto}.cm>div{display:grid;place-items:center;text-align:center;border-radius:.65rem;padding:.45rem}.cm .head{background:var(--surface-3);color:var(--text);font-weight:800}.cm .tp,.cm .tn{background:#064e3b;border:2px solid #34d399;color:#d1fae5}.cm .fp,.cm .fn{background:#4c0519;border:2px solid #fb7185;color:#ffe4e6}.cm b{font-size:1.45rem}.bars{display:flex;align-items:flex-end;justify-content:center;gap:3rem;height:230px;padding:1rem}.bar{width:110px;border-radius:.7rem .7rem 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:.5rem;font-weight:900;color:#07101d}.bar.big{height:185px;background:var(--brand)}.bar.small{height:48px;background:var(--amber)}
+.quiz details{border:1px solid var(--line);border-radius:.72rem;margin:.7rem 0;background:var(--surface-2)}.quiz summary{cursor:pointer;color:var(--heading);font-weight:850;padding:.8rem 1rem}.quiz details p{padding:0 1rem .8rem;margin:0}.section-nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:.55rem;border-top:1px solid var(--line);margin-top:1.6rem;padding-top:1rem;font-size:.78rem}.section-nav a{text-decoration:none;color:var(--muted);padding:.34rem .55rem;border-radius:.45rem}.section-nav a:hover{color:var(--brand);background:var(--surface-2)}.section-nav .next{text-align:left}.related{display:flex;gap:.3rem;flex-wrap:wrap;justify-content:center}.back{position:fixed;left:1.1rem;bottom:1.1rem;width:2.7rem;height:2.7rem;border-radius:50%;display:grid;place-items:center;text-decoration:none;background:var(--brand-strong);color:white;box-shadow:var(--shadow);font-size:1.2rem}
+.overlay{display:none;position:fixed;inset:0;z-index:60;background:var(--overlay);border:0;width:100%;height:100%}dialog{width:min(720px,calc(100% - 2rem));max-height:min(720px,calc(100vh - 2rem));padding:0;border:1px solid var(--line);border-radius:1rem;background:var(--surface);color:var(--text);box-shadow:var(--shadow)}dialog::backdrop{background:var(--overlay)}.search-box{display:flex;align-items:center;gap:.5rem;padding:.75rem;border-bottom:1px solid var(--line)}.search-input{flex:1;border:0;background:transparent;color:var(--heading);font-size:1.03rem;outline:0}.close-search{border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:.5rem;padding:.35rem .55rem}.search-results{list-style:none;margin:0;padding:.55rem;max-height:560px;overflow:auto}.search-results a{display:block;text-decoration:none;border-radius:.55rem;padding:.7rem}.search-results a:hover,.search-results a:focus{background:var(--surface-2)}.result-title{display:block;color:var(--heading);font-weight:900}.result-snippet{display:block;color:var(--muted);font-size:.8rem}.search-empty{padding:1rem;color:var(--muted)}.toast{position:fixed;z-index:120;left:1rem;bottom:1rem;background:var(--heading);color:var(--bg);padding:.55rem .8rem;border-radius:.6rem;box-shadow:var(--shadow);opacity:0;transform:translateY(1rem);pointer-events:none;transition:.18s}.toast.show{opacity:1;transform:none}
+@media(max-width:1050px){.appbar{padding-inline:1rem}.menu-btn{display:inline-flex}.search-trigger{min-width:0}.search-label{display:none}.layout{display:block;padding:1rem}.sidebar{position:fixed;z-index:70;top:0;right:0;height:100dvh;max-height:none;width:min(86vw,340px);border-radius:0;border-block:0;transform:translateX(105%);transition:transform .22s}.sidebar.open{transform:none}.overlay.show{display:block}.hero{padding:3rem 1.5rem}.section{padding:1.35rem}.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){.grid2,.grid3,.grid4{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.flow .arrow{transform:rotate(90deg)}.hero h1{font-size:2.05rem}.diagram{padding:.7rem}.diagram svg{min-width:0!important;width:100%;height:auto}.cm{grid-template-columns:68px repeat(2,minmax(0,1fr));grid-template-rows:48px repeat(2,95px);font-size:.77rem}.bars{gap:1.2rem}.bar{width:90px}.section-nav{grid-template-columns:1fr 1fr}.related{grid-column:1/-1;grid-row:2}.search-trigger{padding-inline:.55rem}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}@media print{.appbar,.sidebar,.overlay,.back,.section-nav,.permalink,.toast{display:none!important}.layout{display:block;max-width:none;padding:0}.hero,.section{box-shadow:none;background:white;border-color:#cbd5e1;break-inside:avoid}.table-disclosure>.table-wrap,.code-disclosure>.code-block{display:block}.table-disclosure>summary,.code-disclosure>summary{display:none}.diagram{background:white}.diagram text{fill:#172033!important}}
+
+.tabs{border:1px solid var(--line);border-radius:.85rem;background:var(--surface-2);overflow:hidden;margin:1.2rem 0}
+.tabs [role="tablist"]{display:flex;gap:.35rem;flex-wrap:wrap;padding:.55rem;border-bottom:1px solid var(--line)}
+.tabs [role="tab"]{border:1px solid transparent;border-radius:.55rem;background:transparent;color:var(--muted);padding:.5rem .8rem;font-weight:850}
+.tabs [role="tab"]:hover{background:var(--surface-3);color:var(--heading)}
+.tabs [role="tab"][aria-selected="true"]{border-color:color-mix(in srgb,var(--brand) 55%,var(--line));background:color-mix(in srgb,var(--brand) 14%,var(--surface));color:var(--brand)}
+.tabs [role="tabpanel"]{padding:1rem 1.15rem}.tabs [role="tabpanel"] p:last-child{margin-bottom:0}
+@media(max-width:680px){.tabs [role="tablist"]{display:grid;grid-template-columns:1fr}.tabs [role="tab"]{width:100%}}
+/* Responsive geometry correction: shared cards, flows and bar diagrams */
+.grid2,.grid3,.grid4,.mini,.record,.metric,.flow .box{min-width:0}
+.mini,.record,.metric,.flow .box{overflow-wrap:anywhere}
+.diagram .grid2,.diagram .grid3,.diagram .grid4{direction:rtl;unicode-bidi:normal}
+.flow{display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;gap:.5rem}
+.flow .box{flex:1 1 0;max-width:none}
+.flow .arrow{flex:0 0 auto}
+.bars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:1rem;height:230px;padding:1rem}
+.bar{width:100%;min-width:0;line-height:1.35;text-align:center;padding:.65rem .3rem;overflow-wrap:anywhere}
+.bar.small{height:92px}.bar.big{height:185px}
+@media(max-width:900px){
+  .flow{flex-direction:column;align-items:stretch;gap:.45rem}
+  .flow .box{flex:0 0 auto;max-width:none;width:100%}
+  .flow .arrow{transform:rotate(90deg);align-self:center;line-height:1}
+}
+@media(max-width:680px){
+  .bars{gap:.55rem;height:210px;padding:.65rem .2rem}
+  .bar{width:100%;font-size:.74rem;padding:.55rem .15rem}
+  .bar.small{height:96px}.bar.big{height:175px}
+}
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">رفتن به محتوای اصلی</a>
+  <header class="appbar"><button class="icon-btn menu-btn" id="menu-button" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="بازکردن فهرست">☰</button><div class="brand">جلسهٔ ۵ — مستند توضیحی</div><button class="search-trigger" id="search-trigger" type="button" aria-haspopup="dialog"><span class="search-label">جستجو در متن و کدها</span><span class="shortcut">Ctrl K</span></button><button class="icon-btn" id="theme-toggle" type="button" aria-label="تغییر پوسته" title="تغییر پوسته">◐</button></header>
+  <button class="overlay" id="drawer-overlay" type="button" aria-label="بستن فهرست"></button>
+  <div class="layout"><aside class="sidebar" id="sidebar" aria-label="فهرست مستند" tabindex="-1">
+  <div class="side-title">نقشهٔ جلسهٔ پنجم</div>
+  <details class="nav-group" open><summary>از خروجی عددی تا Class</summary><a class="toc" href="#start">شروع مستند</a><a class="toc" href="#overview">داستان جلسه</a><a class="toc" href="#sources">منابع</a><a class="toc" href="#classification">Classification و Label</a><a class="toc" href="#logistic">Logistic Regression</a></details>
+  <details class="nav-group" open><summary>احتمال و جریان داده</summary><a class="toc" href="#probability">Probability و Threshold</a><a class="toc" href="#loss">Cross-Entropy و وزن Class</a><a class="toc" href="#column-transformer">ColumnTransformer</a><a class="toc" href="#pipeline">Pipeline</a><a class="toc" href="#custom-estimator">Estimator سفارشی</a></details>
+  <details class="nav-group"><summary>Support Vector Machine</summary><a class="toc" href="#svm-intuition">Margin و Support Vector</a><a class="toc" href="#kernels">Kernel Trick</a><a class="toc" href="#hyperparameters">C، gamma و degree</a><a class="toc" href="#search">Grid Search و CV</a><a class="toc" href="#multiclass">چندکلاسه و سه‌بعدی</a></details>
+  <details class="nav-group"><summary>دادهٔ غیرعادی و تصویر</summary><a class="toc" href="#anomaly">One-Class SVM و DBSCAN</a><a class="toc" href="#caltech">Caltech101</a><a class="toc" href="#pitfalls">دام‌های فایل‌ها</a><a class="toc" href="#review">خودآزمایی</a><a class="toc" href="#glossary">واژه‌نامه</a></details>
+  <div class="source-note">بازنویسی توضیحیِ دو ضبط، چهار Notebook و هفت Script جلسهٔ پنجم؛ خروجی‌های ذخیره‌شده با کد فعلی تطبیق داده شده‌اند.</div>
+</aside><main id="main-content">
+<header class="hero" id="start">
+  <span class="eyebrow">یادگیری ماشین — جلسهٔ پنجم</span>
+  <h1>چطور از یک امتیاز عددی، تصمیم طبقه‌بندی قابل‌اعتماد بسازیم؟</h1>
+  <p>جلسه از Logistic Regression و احتمال شروع می‌شود، Preprocessing داده‌های عددی و دسته‌ای را در Pipeline منسجم می‌کند و سپس به Support Vector Machine می‌رسد؛ مدلی که مرز تصمیم را با Margin، Support Vector و Kernel می‌سازد. پایان جلسه هم مسیر تشخیص دادهٔ غیرعادی و آماده‌سازی دیتاست تصویری Caltech101 را باز می‌کند.</p>
+  <div class="chips"><span class="chip">Logistic Regression</span><span class="chip">Probability</span><span class="chip">Pipeline</span><span class="chip">SVM &amp; Kernel</span></div>
+</header>
+
+<section class="section card" id="overview">
+  <h2 class="section-title">اگر کل جلسه را در یک داستان ببینیم</h2>
+  <p>در Classification پاسخ دیگر یک عدد آزاد نیست؛ هر Sample باید به یک Class برسد. اما مدل پیش از تصمیم نهایی معمولاً یک Score یا Probability می‌سازد. Threshold این خروجی پیوسته را به Label تبدیل می‌کند و Loss به مدل می‌گوید Probabilityهایش چقدر با جواب واقعی فاصله دارند.</p>
+  <p>وقتی Featureها از جنس‌های متفاوت‌اند، همه را نمی‌توان با یک Transformer آماده کرد. ستون‌های عددی به Scaling و ستون‌های دسته‌ای به Encoding نیاز دارند. <code>ColumnTransformer</code> این مسیرهای موازی را می‌سازد و <code>Pipeline</code> آن‌ها را به Model متصل می‌کند. بعد از این زیرساخت، SVM نشان می‌دهد تعریف مرز تصمیم فقط «کشیدن یک خط» نیست: Margin، Support Vector و Kernel شکل و حساسیت مرز را تعیین می‌کنند.</p>
+  <div class="flow"><span class="box">دادهٔ خام</span><i class="arrow">←</i><span class="box">Preprocessing</span><i class="arrow">←</i><span class="box">Decision Score</span><i class="arrow">←</i><span class="box">Probability / Threshold</span><i class="arrow">←</i><span class="box">Class</span></div>
+  <div class="note info"><strong>ایدهٔ محوری:</strong> Prediction فقط آخرین Label نیست. برای فهم رفتار Classifier باید مسیر داده، Score، Probability، Threshold و معیار ارزیابی را کنار هم ببینیم.</div>
+</section>
+
+<section class="section card" id="sources">
+  <h2 class="section-title">منابع جلسه و ترتیب ضبط‌ها</h2>
+  <p>جلسهٔ پنجم دو ضبط دارد که بر اساس شمارهٔ پایانی نام فایل مرتب شده‌اند. مجموع زمان آن‌ها حدود سه ساعت و بیست‌وسه دقیقه است. ضبط اول ۱:۱۵:۵۵ و ضبط دوم ۲:۰۷:۳۵ طول دارد.</p>
+  <div class="grid2"><article class="record"><strong><bdi>0001</bdi> — ۱:۱۵:۵۵</strong><p>Binary/Multi-class Classification، مشکل Linear Regression، Sigmoid، Logistic Regression، <code>predict_proba</code>، Confidence، Cross-Entropy، Class Weight و اشاره به L1/L2.</p></article><article class="record"><strong><bdi>0002</bdi> — ۲:۰۷:۳۵</strong><p><code>ColumnTransformer</code>، Pipeline، قرارداد Estimator سفارشی، SVM، Margin، Kernel، <code>C</code>، <code>gamma</code>، Grid/Random Search، One-Class SVM، DBSCAN و معرفی Caltech101.</p></article></div>
+  <p>فایل‌های اصلی <code>01.ipynb</code>، <code>02.ipynb</code> و <code>03.ipynb</code> به‌ترتیب مثال Logistic Regression، Pipeline و SVM را نگه می‌دارند. <code>svm.ipynb</code> و Scriptهای <code>06.py</code> تا <code>11.py</code> مرزهای دو و سه‌بعدی و اثر Hyperparameterها را نشان می‌دهند.</p>
+</section>
+
+<section class="section card" id="classification">
+  <h2 class="section-title">۱. Classification یعنی انتخاب میان جواب‌های گسسته</h2>
+  <p>در Regression خروجی می‌تواند هر عددی روی یک بازه باشد. در Classification خروجی یکی از Classهای مشخص است. دو Class حالت Binary و بیش از دو Class حالت Multi-class نام دارد. Label ممکن است متن باشد، اما مدل معمولاً آن را به عدد داخلی تبدیل می‌کند.</p>
+  <div class="grid3"><article class="mini"><strong>Binary</strong><p>دو جواب مانند سالم/بیمار یا قبول/رد.</p></article><article class="mini"><strong>Multi-class</strong><p>یک جواب از چند Class؛ مانند نوع حیوان یا گروه بیماری.</p></article><article class="mini"><strong>Multi-label</strong><p>چند Label می‌توانند هم‌زمان برای یک Sample درست باشند؛ این حالت با Multi-class یکی نیست.</p></article></div>
+  <p>Notebook اول آرایه‌ای از اندازه‌ها را به Labelهای <code>healthy</code>، <code>sick</code> و <code>a</code> وصل می‌کند. <code>LabelEncoder</code> این نام‌ها را بر اساس ترتیب داخلی به ۰، ۱ و ۲ تبدیل می‌کند. این اعداد شناسهٔ Class هستند؛ فاصلهٔ ۰ تا ۲ به معنی «دو برابر دورتر» نیست.</p>
+  <pre data-file="labels.py" data-summary="تبدیل نام Classها به شناسه" data-highlight="4,5">size = np.array([3, 4, 7, 9, 11, 34, 36, 37, 39, 42, 200]).reshape(-1, 1)
+result = np.array(["healthy", "healthy", "healthy", "healthy", "healthy",
+                   "sick", "sick", "sick", "a", "a", "a"])
+encoder = LabelEncoder()
+y = encoder.fit_transform(result)</pre>
+  <div class="note warn"><strong>نکتهٔ مهم:</strong> <code>LabelEncoder</code> برای Target مناسب است، اما استفاده از شناسه‌های آن به‌عنوان Feature می‌تواند ترتیب و فاصلهٔ مصنوعی وارد مدل کند.</div>
+</section>
+
+<section class="section card" id="logistic">
+  <h2 class="section-title">۲. چرا Linear Regression جای Classifier را نمی‌گیرد؟</h2>
+  <p>یک ایدهٔ ساده این است که خط Regression را برازش بدهیم و هر مقدار کمتر از ۰٫۵ را Class صفر و بقیه را Class یک بنامیم. مشکل اینجاست که خروجی خط به بازهٔ صفر و یک محدود نیست. یک Sample دورافتاده می‌تواند شیب خط را تغییر دهد و Threshold را در جای نامناسبی قطع کند. در مثال سه‌کلاسهٔ Notebook نیز تبدیل همهٔ مقدارهای بالاتر از ۰٫۵ به ۱ عملاً Class شمارهٔ ۲ را از بین می‌برد.</p>
+  <div class="diagram"><div class="diagram-title">از Score خطی تا احتمال</div><div class="flow"><span class="box">z = wᵀx + b</span><i class="arrow">←</i><span class="box">Sigmoid</span><i class="arrow">←</i><span class="box">0 &lt; p &lt; 1</span><i class="arrow">←</i><span class="box">Threshold</span><i class="arrow">←</i><span class="box">Class</span></div></div>
+  <p>Sigmoid هر عدد حقیقی را به بازهٔ صفر تا یک می‌برد. در صفر مقدارش ۰٫۵ است، برای عددهای منفی به صفر نزدیک می‌شود و برای عددهای مثبت به یک. Logistic Regression ابتدا ترکیب خطی Featureها را می‌سازد و سپس آن را به Probability تبدیل می‌کند.</p>
+  <div class="equation">σ(z) = 1 / (1 + exp(−z))</div>
+  <pre data-file="sigmoid.py" data-summary="تابع Sigmoid کلاس" data-highlight="1,2">def logistic(z):
+    return 1 / (1 + np.exp(-z))
+
+z = np.arange(-10, 11)
+p = logistic(z)</pre>
+  <div class="note info"><strong>نام مدل گمراه‌کننده است:</strong> Logistic Regression برای Classification استفاده می‌شود. واژهٔ Regression به مدل‌کردن Log-Odds با یک تابع خطی اشاره دارد، نه نوع خروجی نهایی.</div>
+</section>
+
+<section class="section card" id="probability">
+  <h2 class="section-title">۳. <code>predict</code>، <code>predict_proba</code> و Threshold یک چیز نیستند</h2>
+  <p><code>predict_proba</code> برای هر Sample یک Probability به ازای هر Class می‌دهد. مجموع Probabilityهای هر ردیف تقریباً یک است. <code>predict</code> معمولاً Class با بیشترین Score/Probability را برمی‌گرداند. Confidence در گفتار کلاس همان بزرگی احتمال Class انتخاب‌شده است، اما Probability بزرگ لزوماً Calibration خوب را تضمین نمی‌کند.</p>
+  <div class="tabs" data-tabs><div role="tablist" aria-label="خروجی‌های Classifier"><button role="tab" aria-selected="true" data-tab="label">predict</button><button role="tab" aria-selected="false" data-tab="proba">predict_proba</button><button role="tab" aria-selected="false" data-tab="log-proba">predict_log_proba</button></div><section role="tabpanel" data-panel="label"><p>یک Label نهایی برای هر Sample؛ مناسب تصمیم، اما اطلاعات میزان اطمینان را پنهان می‌کند.</p></section><section role="tabpanel" data-panel="proba" hidden><p>بردار Probabilityها؛ برای تغییر Threshold، رتبه‌بندی و تحلیل Confidence مفید است.</p></section><section role="tabpanel" data-panel="log-proba" hidden><p>لگاریتم Probabilityها؛ از نظر عددی برای بعضی محاسبات پایدارتر است.</p></section></div>
+  <pre data-file="classifier_outputs.py" data-summary="مقایسهٔ Label و Probability" data-highlight="3,4">clf = LogisticRegression()
+clf.fit(X_train, y_train)
+y_label = clf.predict(X_test)
+y_proba = clf.predict_proba(X_test)
+confidence = y_proba.max(axis=1)</pre>
+  <p>Threshold پیش‌فرض Binary معمولاً ۰٫۵ است، اما انتخاب درست به هزینهٔ خطا بستگی دارد. پایین‌آوردن Threshold معمولاً Recall را زیاد و Precision را کم می‌کند؛ بالابردنش جهت عکس دارد. Accuracy، Precision، Recall و F1 باید متناسب با مسئله خوانده شوند، نه به‌عنوان چهار عدد تزئینی.</p>
+  <div class="note danger"><strong>Probability با قطعیت یکی نیست:</strong> مقدار ۰٫۹ فقط وقتی معنای قابل‌اعتماد دارد که مدل Calibration مناسبی داشته باشد و دادهٔ استفاده با دادهٔ آموزش هم‌توزیع باشد.</div>
+</section>
+
+<section class="section card" id="loss">
+  <h2 class="section-title">۴. Cross-Entropy؛ Probability اشتباه را جریمه می‌کنیم</h2>
+  <p>برای آموزش Classifier فقط درست یا غلط بودن Label کافی نیست. مدلی که جواب درست را با احتمال ۰٫۵۱ داده، با مدلی که همان جواب را با احتمال ۰٫۹۹ داده رفتار یکسانی ندارد. Cross-Entropy احتمال Class درست را وارد Log می‌کند؛ هرچه مدل به جواب درست Probability کمتری بدهد، Loss بزرگ‌تر می‌شود.</p>
+  <div class="equation">L = − Σᵢ yᵢ log(pᵢ)</div>
+  <p>در Binary Classification شکل کامل معمولاً هر دو حالت را دارد: <code>−[y log(p) + (1−y) log(1−p)]</code>. در Multi-class، y به‌صورت One-hot مشخص می‌کند کدام Probability باید در Loss نقش اصلی داشته باشد. <code>log_loss</code> در scikit-learn همین منطق را پیاده می‌کند.</p>
+  <div class="grid3"><article class="mini"><strong>Class Weight</strong><p>Loss نمونه‌های Class کم‌تعداد یا مهم‌تر را وزن بیشتری می‌دهد.</p></article><article class="mini"><strong>L1</strong><p>بعضی Coefficientها را به صفر نزدیک یا دقیقاً صفر می‌کند.</p></article><article class="mini"><strong>L2</strong><p>وزن‌های بزرگ را نرم‌تر جریمه می‌کند و پیش‌فرض رایج Logistic Regression است.</p></article></div>
+  <p>Class Weight راهی برای اصلاح هزینهٔ خطاست، نه ساختن اطلاعات جدید. اگر Class کوچک پوشش مناسبی در Train ندارد، وزن بیشتر به‌تنهایی جای دادهٔ نماینده را نمی‌گیرد.</p>
+</section>
+
+<section class="section card" id="column-transformer">
+  <h2 class="section-title">۵. <code>ColumnTransformer</code>؛ هر ستون مسیر مناسب خودش را می‌رود</h2>
+  <p>Notebook دوم DataFrame کوچکی با سه ستون عددی و یک ستون <code>male/female</code> می‌سازد. ستون‌های عددی با <code>StandardScaler</code> و ستون دسته‌ای با <code>OneHotEncoder</code> آماده می‌شوند. خروجی این دو شاخه کنار هم قرار می‌گیرد و یک ماتریس Feature واحد می‌سازد.</p>
+  <div class="flow"><span class="box">a, b, c</span><i class="arrow">←</i><span class="box">StandardScaler</span><i class="arrow">←</i><span class="box">Featureهای عددی</span></div>
+  <div class="flow"><span class="box">d</span><i class="arrow">←</i><span class="box">OneHotEncoder</span><i class="arrow">←</i><span class="box">Featureهای دسته‌ای</span></div>
+  <pre data-file="preprocess.py" data-summary="دو شاخهٔ Preprocessing" data-highlight="2,4,5" data-open="true">preprocess = ColumnTransformer(
+    transformers=[
+        ("scaler", StandardScaler(), ["a", "b", "c"]),
+        ("encoder", OneHotEncoder(handle_unknown="ignore"), ["d"]),
+    ]
+)</pre>
+  <p><code>handle_unknown="ignore"</code> در نسخهٔ تمیز بالا اضافه شده تا Category تازه در Test یا Production باعث خطا نشود. Transformerها باید فقط روی Train <code>fit</code> شوند؛ میانگین و انحراف معیار Test نباید وارد Scaling شود.</p>
+  <div class="note warn"><strong>چرا LabelEncoder اینجا مناسب نبود؟</strong> <code>ColumnTransformer</code> ورودی ستونی دوبعدی می‌دهد، اما <code>LabelEncoder</code> برای Target یک‌بعدی طراحی شده است. در ویدئو این تلاش خطا می‌دهد و با OneHotEncoder جایگزین می‌شود.</div>
+</section>
+
+<section class="section card" id="pipeline">
+  <h2 class="section-title">۶. Pipeline قرارداد یکسان Train و Predict را نگه می‌دارد</h2>
+  <p>اگر Preprocessing را دستی اجرا کنیم، ممکن است هنگام Prediction یک مرحله یا ترتیبش را فراموش کنیم. Pipeline Transformerها و Model را در یک شیء قرار می‌دهد. هنگام <code>fit</code>، Transformerها فقط از Train یاد می‌گیرند؛ هنگام <code>predict</code> همان تبدیل یادگرفته‌شده بدون Fit دوباره اجرا می‌شود.</p>
+  <pre data-file="classification_pipeline.py" data-summary="Pipeline دادهٔ ترکیبی" data-highlight="1,3,7,8" data-open="true">pipeline = Pipeline([
+    ("preprocessor", preprocess),
+    ("model", LogisticRegression()),
+])
+
+pipeline.fit(x_train, y_train)
+y_pred_train = pipeline.predict(x_train)
+y_pred_test = pipeline.predict(x_test)</pre>
+  <p>Notebook هشت ردیف تکراری دارد و Split آن بسیار کوچک است؛ پس Accuracy حاصل را نباید به‌عنوان برآورد پایدار تعمیم تفسیر کرد. هدف این مثال نشان‌دادن اتصال Componentهاست، نه ارائهٔ یک Benchmark.</p>
+  <div class="diagram"><div class="diagram-title">مرز یادگیری پارامترها</div><div class="flow"><span class="box">Train خام</span><i class="arrow">←</i><span class="box">fit Preprocessor</span><i class="arrow">←</i><span class="box">transform</span><i class="arrow">←</i><span class="box">fit Model</span></div><small>Test فقط از پارامترهای یادگرفته‌شده عبور می‌کند؛ در ساخت آن‌ها سهم ندارد.</small></div>
+</section>
+
+<section class="section card" id="custom-estimator">
+  <h2 class="section-title">۷. Estimator سفارشی باید قرارداد scikit-learn را رعایت کند</h2>
+  <p>ضبط دوم نشان می‌دهد Pipeline فقط با Modelهای آماده محدود نیست. یک Class سفارشی می‌تواند با ارث‌بری از <code>BaseEstimator</code> و Mixin مناسب در اکوسیستم scikit-learn قرار بگیرد. Hyperparameterها در <code>__init__</code> ذخیره می‌شوند، <code>fit</code> شیء را برمی‌گرداند و <code>predict</code> برای Sampleهای تازه خروجی می‌سازد.</p>
+  <pre data-file="custom_classifier.py" data-summary="اسکلت صحیح یک Classifier سفارشی" data-highlight="1,4,8,11">class CustomClassifier(BaseEstimator, ClassifierMixin):
+    def __init__(self, alpha=1.0):
+        self.alpha = alpha
+
+    def fit(self, X, y):
+        self.classes_ = np.unique(y)
+        # پارامترهای یادگرفته‌شده با پسوند _ ذخیره می‌شوند
+        return self
+
+    def predict(self, X):
+        raise NotImplementedError
+
+    def predict_proba(self, X):
+        raise NotImplementedError</pre>
+  <p>فایل <code>03.py</code> عمداً اسکلت ناقص دارد و متدها <code>pass</code> هستند؛ پس Model قابل‌آموزش واقعی نیست. همچنین <code>CustomClassifier</code> در آن Hyperparameterهای اجباری <code>C</code> و <code>alpha</code> دارد، اما داخل Pipeline بدون آرگومان ساخته شده و اجرا خطا می‌دهد.</p>
+  <div class="note info"><strong>چرا BaseEstimator مهم است؟</strong> پیاده‌سازی استاندارد <code>get_params</code>/<code>set_params</code> را فراهم می‌کند تا Pipeline، Clone و ابزارهای جست‌وجوی Hyperparameter بتوانند با Estimator کار کنند.</div>
+</section>
+
+<section class="section card" id="svm-intuition">
+  <h2 class="section-title">۸. SVM فقط یک خط جداکننده نمی‌خواهد؛ بیشترین Margin را می‌خواهد</h2>
+  <p>برای دادهٔ Linearly Separable چند خط می‌توانند Classها را جدا کنند. SVM خط یا Hyperplaneای را ترجیح می‌دهد که فاصله‌اش از نزدیک‌ترین Sampleهای دو طرف بیشترین باشد. این فاصله Margin است. Sampleهایی که مرز Margin را تعیین می‌کنند Support Vector نام دارند.</p>
+  <div class="diagram"><div class="diagram-title">شماتیک Margin و Support Vector</div><svg viewBox="0 0 840 360" role="img" aria-label="دو کلاس، مرز تصمیم و دو خط حاشیه"><g stroke-width="3"><line x1="325" y1="40" x2="505" y2="320" stroke="#52d6ee" stroke-width="6"/><line x1="245" y1="45" x2="425" y2="325" stroke="#f7c95c" stroke-dasharray="9 8"/><line x1="405" y1="35" x2="585" y2="315" stroke="#f7c95c" stroke-dasharray="9 8"/></g><g fill="#79e6a3"><circle cx="180" cy="95" r="10"/><circle cx="230" cy="145" r="10"/><circle cx="170" cy="210" r="10"/><circle cx="285" cy="225" r="13" stroke="#fff" stroke-width="4"/></g><g fill="#ff9cad"><circle cx="650" cy="95" r="10"/><circle cx="610" cy="165" r="10"/><circle cx="690" cy="225" r="10"/><circle cx="545" cy="135" r="13" stroke="#fff" stroke-width="4"/></g><g fill="#d6e2f2" font-size="19"><text x="420" y="345" text-anchor="middle">Decision Boundary</text><text x="215" y="285">Support Vector</text><text x="575" y="85">Support Vector</text></g></svg></div>
+  <p>در Soft-Margin SVM اجازه می‌دهیم بعضی Sampleها داخل Margin یا حتی سمت اشتباه قرار بگیرند. این انعطاف برای دادهٔ دارای Noise ضروری است. Model نباید برای یک نقطهٔ پرت، مرزی بسیار پیچیده بسازد و Generalization را قربانی کند.</p>
+  <div class="note ok"><strong>ویژگی مهم:</strong> جایگاه مرز بیش از همه از Support Vectorها اثر می‌گیرد. نقاط دور از Margin معمولاً تغییر کوچکی در مرز ایجاد نمی‌کنند.</div>
+</section>
+
+<section class="section card" id="kernels">
+  <h2 class="section-title">۹. Kernel Trick؛ جدایی سخت را در فضای دیگری ساده کنیم</h2>
+  <p>اگر Classها با خط مستقیم جدا نشوند، می‌توان داده را به فضای Feature غنی‌تری نگاشت کرد. الگویی که در دو بُعد حلقه‌ای است ممکن است در سه بُعد با یک صفحه جدا شود. Kernel این شباهت در فضای جدید را بدون ساخت صریح همهٔ Featureهای آن فضا محاسبه می‌کند.</p>
+  <div class="flow"><span class="box">فضای ۲بعدیِ غیرخطی</span><i class="arrow">←</i><span class="box">Kernel Mapping</span><i class="arrow">←</i><span class="box">فضای پربُعدتر</span><i class="arrow">←</i><span class="box">Hyperplane خطی</span></div>
+  <div class="table-wrap"><table><thead><tr><th>Kernel</th><th>رفتار</th><th>پارامترهای حساس</th></tr></thead><tbody><tr><td><code>linear</code></td><td>مرز خطی؛ مناسب وقتی Featureها از قبل جدایی خوبی دارند.</td><td><code>C</code></td></tr><tr><td><code>poly</code></td><td>تعامل‌های چندجمله‌ای و مرزهای خمیده.</td><td><code>C</code>، <code>degree</code>، <code>gamma</code>، <code>coef0</code></td></tr><tr><td><code>rbf</code></td><td>مرز محلی و منعطف بر اساس فاصله.</td><td><code>C</code> و <code>gamma</code></td></tr><tr><td><code>sigmoid</code></td><td>رفتاری شبیه تابع فعال‌سازی؛ همیشه انتخاب مناسب نیست.</td><td><code>C</code>، <code>gamma</code> و <code>coef0</code></td></tr></tbody></table></div>
+  <div class="equation">RBF(x, x′) = exp(−γ ||x − x′||²)</div>
+  <p>Notebook و <code>06.py</code> Kernelهای Linear، Polynomial، RBF و Sigmoid را روی دادهٔ <code>make_moons</code> مقایسه می‌کنند. شکل مرز نتیجهٔ هم‌زمان Kernel و Hyperparameterهاست؛ نام Kernel به‌تنهایی پیچیدگی را مشخص نمی‌کند.</p>
+</section>
+
+<section class="section card" id="hyperparameters">
+  <h2 class="section-title">۱۰. <code>C</code> و <code>gamma</code> چه چیزی را کنترل می‌کنند؟</h2>
+  <div class="tabs" data-tabs><div role="tablist" aria-label="Hyperparameterهای SVM"><button role="tab" aria-selected="true" data-tab="c">C</button><button role="tab" aria-selected="false" data-tab="gamma">gamma</button><button role="tab" aria-selected="false" data-tab="degree">degree</button></div><section role="tabpanel" data-panel="c"><p><b>C بزرگ:</b> خطاهای Train گران‌ترند و Model تلاش بیشتری برای درست‌کردن Sampleها می‌کند؛ Margin معمولاً تنگ‌تر و خطر Overfitting بیشتر می‌شود. <b>C کوچک:</b> خطا تحمل می‌شود و Margin نرم‌تر است.</p></section><section role="tabpanel" data-panel="gamma" hidden><p>در RBF، gamma بزرگ اثر هر Sample را محلی‌تر و مرز را پرپیچ‌وخم‌تر می‌کند. gamma کوچک اثر گسترده‌تری می‌دهد و مرز نرم‌تر می‌شود.</p></section><section role="tabpanel" data-panel="degree" hidden><p>برای Polynomial Kernel درجهٔ تعامل‌ها را تعیین می‌کند. درجهٔ بالاتر ظرفیت را زیاد می‌کند، اما هزینهٔ محاسبات و خطر Overfitting نیز بیشتر می‌شود.</p></section></div>
+  <p>SVM به Scale حساس است، چون فاصله و Dot Product در تصمیم نقش دارند. اگر یک Feature دامنهٔ هزاران و دیگری دامنهٔ یک داشته باشد، Feature بزرگ‌تر هندسه را تسخیر می‌کند. <code>StandardScaler</code> باید داخل Pipeline و فقط روی Train Fit شود.</p>
+  <pre data-file="svm_pipeline.py" data-summary="Scaling و SVM در یک قرارداد" data-highlight="2,3,6">svm_pipeline = Pipeline([
+    ("scaler", StandardScaler()),
+    ("model", SVC(kernel="rbf", C=1, gamma="scale")),
+])
+
+svm_pipeline.fit(X_train, y_train)
+y_pred = svm_pipeline.predict(X_test)</pre>
+  <div class="note warn"><strong>یک پارامتر در همهٔ Kernelها اثر یکسان ندارد:</strong> مثلاً <code>gamma</code> در Linear Kernel نقشی ندارد. Grid Search خام ممکن است ترکیب‌های بی‌اثر را بیهوده امتحان کند.</div>
+</section>
+
+<section class="section card" id="search">
+  <h2 class="section-title">۱۱. Hyperparameter Search باید داخل Cross-Validation انجام شود</h2>
+  <p>Notebook سوم پنج مقدار برای <code>C</code>، پنج مقدار برای <code>gamma</code> و سه Kernel تعریف می‌کند: ۷۵ ترکیب. با <code>cv=3</code> مجموعاً ۲۲۵ Fit انجام می‌شود. بهترین خروجی ذخیره‌شده <code>C=10</code>، <code>gamma=1</code> و <code>kernel="rbf"</code> است.</p>
+  <pre data-file="svm_search.py" data-summary="جست‌وجوی SVM با Cross-Validation" data-highlight="2,3,4,8,9">parameters = {
+    "C": [0.01, 0.1, 0.5, 1, 10],
+    "gamma": [0.01, 0.1, 0.5, 1, 10],
+    "kernel": ["linear", "poly", "rbf"],
+}
+
+grid_model = GridSearchCV(
+    SVC(), param_grid=parameters, cv=3,
+    scoring="accuracy", n_jobs=-1
+)
+grid_model.fit(X_train, y_train)</pre>
+  <div class="grid2"><article class="mini"><strong>GridSearchCV</strong><p>همهٔ ترکیب‌های مشخص‌شده را می‌سنجد؛ کامل اما پرهزینه.</p></article><article class="mini"><strong>RandomizedSearchCV</strong><p>تعداد محدودی ترکیب را از توزیع‌ها یا فهرست‌ها نمونه می‌گیرد؛ برای فضای بزرگ سریع‌تر است.</p></article></div>
+  <p>برای گزارش نهایی باید Test جدا بماند. Cross-Validation انتخاب Hyperparameter را انجام می‌دهد و Test فقط یک بار عملکرد Model انتخاب‌شده را می‌سنجد. در Notebook، <code>best_estimator_</code> دوباره روی همان کل X پیش‌بینی می‌کند و Classification Report حدود ۰٫۹۸ می‌دهد؛ این Training Report است و برآورد منصفانهٔ دادهٔ ندیده نیست.</p>
+  <div class="note danger"><strong>Data Leakage در Search:</strong> اگر Scaling پیش از GridSearch روی کل داده Fit شود، Foldهای Validation اطلاعاتی از بقیهٔ داده دیده‌اند. Transformer و SVC باید با هم داخل Pipeline قرار بگیرند و خود Pipeline جست‌وجو شود.</div>
+</section>
+
+<section class="section card" id="multiclass">
+  <h2 class="section-title">۱۲. از خط دوبعدی تا صفحهٔ سه‌بعدی و مسئلهٔ چندکلاسه</h2>
+  <p>در دو Feature، مرز خطی یک خط است؛ در سه Feature یک صفحه؛ و در فضای nبعدی Hyperplane. Scriptهای <code>10.py</code> و <code>11.py</code> دادهٔ سه‌بعدی می‌سازند و صفحات یا حجم‌های تصمیم را نمایش می‌دهند. هدف شکل‌ها دیدن این نکته است که «مرز» با افزایش Feature ناپدید نمی‌شود؛ فقط دیگر نمی‌توانیم مستقیم آن را رسم کنیم.</p>
+  <p>SVC برای Multi-class چند مسئلهٔ Binary می‌سازد. <code>decision_function_shape="ovo"</code> به راهبرد One-vs-One اشاره دارد: هر جفت Class با هم مقایسه می‌شوند. در سه Class سه مدل جفتی داریم. این صفحات را نباید ساده‌انگارانه «یک صفحه برای هر Class» نامید.</p>
+  <div class="diagram"><div class="diagram-title">تعداد Classifierهای One-vs-One</div><div class="equation">k classes → k(k − 1) / 2 binary classifiers</div><small>برای ۳ Class، سه مقایسهٔ دوتایی ساخته می‌شود.</small></div>
+  <div class="note info"><strong>Decision Score با Probability فرق دارد:</strong> SVC به‌طور پیش‌فرض <code>probability=False</code> است. <code>decision_function</code> فاصلهٔ علامت‌دار از مرز را می‌دهد؛ Probability فقط با فعال‌کردن Calibration داخلی و هزینهٔ Fit بیشتر فراهم می‌شود.</div>
+</section>
+
+<section class="section card" id="anomaly">
+  <h2 class="section-title">۱۳. One-Class SVM و DBSCAN؛ وقتی Label عادی/غیرعادی نداریم</h2>
+  <p>در پایان ضبط دوم، One-Class SVM برای Outlier Detection معرفی می‌شود. Model عمدتاً شکل ناحیهٔ دادهٔ عادی را یاد می‌گیرد و نقاط بیرون آن را غیرعادی علامت می‌زند. این مسئله با SVC دودسته‌ای فرق دارد، چون معمولاً نمونهٔ Labelخوردهٔ کافی از تمام Anomalyها نداریم.</p>
+  <div class="table-wrap"><table><thead><tr><th>روش</th><th>ایده</th><th>پارامتر حساس</th></tr></thead><tbody><tr><td>One-Class SVM</td><td>ساخت مرزی دور دادهٔ عادی در فضای Kernel.</td><td><code>nu</code>، <code>gamma</code> و Scale</td></tr><tr><td>DBSCAN</td><td>خوشه‌های چگال را پیدا و نقاط بدون همسایهٔ کافی را Noise می‌نامد.</td><td><code>eps</code> و <code>min_samples</code></td></tr><tr><td>LOF</td><td>چگالی محلی هر نقطه را با همسایه‌هایش مقایسه می‌کند.</td><td><code>n_neighbors</code></td></tr></tbody></table></div>
+  <p>مدرس DBSCAN و جدول مقایسهٔ روش‌های Outlier را در حد اتصال مفهومی مطرح می‌کند؛ پیاده‌سازی کامل آن در فایل جلسه وجود ندارد. نقاط «غیرعادی» نیز الزاماً خطای داده نیستند و قبل از حذف باید معنای دامنه‌ای آن‌ها بررسی شود.</p>
+</section>
+
+<section class="section card" id="caltech">
+  <h2 class="section-title">۱۴. Caltech101؛ دیتاست تصویر قبل از Model چه شکلی دارد؟</h2>
+  <p>بخش پایانی ضبط ساختار پوشه‌ای Caltech101 را نشان می‌دهد: هر Category یک Folder و هر تصویر یک فایل داخل آن است. نسخهٔ موجود در پوشهٔ کلاس ۱۰۱ Category و ۸۶۷۷ فایل JPG دارد. تعداد تصویرها نامتوازن است؛ کوچک‌ترین Class فقط ۳۱ و بزرگ‌ترین Class ۸۰۰ تصویر دارد.</p>
+  <div class="diagram"><div class="diagram-title">ساختار Dataset روی دیسک</div><div class="flow"><span class="box">caltech101/</span><i class="arrow">←</i><span class="box">airplanes/</span><i class="arrow">←</i><span class="box">image_0001.jpg …</span></div><div class="flow"><span class="box">caltech101/</span><i class="arrow">←</i><span class="box">helicopter/</span><i class="arrow">←</i><span class="box">image_0001.jpg …</span></div></div>
+  <div class="grid3"><article class="mini"><strong>اندازهٔ متفاوت</strong><p>تصویرها Width/Height یکسان ندارند؛ Batch عددی به Shape ثابت نیاز دارد.</p></article><article class="mini"><strong>عدم‌توازن</strong><p>Classهای ۳۱ تا ۸۰۰ تصویری سهم یکسانی ندارند.</p></article><article class="mini"><strong>Folder = Label</strong><p>نام Folder منبع Target است و باید هنگام Split با مسیر فایل هماهنگ بماند.</p></article></div>
+  <p>در این جلسه فقط دیتاست کپی و چند تصویر از Categoryهای مختلف باز می‌شود؛ Model تصویری ساخته نشده است. گام بعدی منطقی شامل خواندن فایل‌ها، Resize یا Padding، تبدیل Pixelها به آرایه، Split در سطح فایل و سپس Feature Extraction/Model است. این مسیر در این مستند به‌عنوان ادامهٔ لازم برچسب خورده، نه کاری که در ضبط تکمیل شده باشد.</p>
+  <div class="note warn"><strong>قبل از Resize:</strong> کشیدن همهٔ تصویرها به یک مربع می‌تواند نسبت طول‌وعرض را خراب کند. انتخاب Resize، Crop یا Padding باید یک قرارداد ثابت و قابل‌آزمایش باشد.</div>
+</section>
+
+<section class="section card" id="pitfalls">
+  <h2 class="section-title">۱۵. دام‌های واقعی Notebookها و Scriptها</h2>
+  <div class="table-wrap"><table><thead><tr><th>فایل</th><th>مسئله</th><th>برداشت مطمئن‌تر</th></tr></thead><tbody><tr><td><code>01.ipynb</code></td><td>متغیر X برای رسم Sigmoid از ۱۱ Sample به ۲۱ عدد بازنویسی می‌شود؛ Cell بعدی Logistic Regression با y یازده‌تایی سازگار نیست.</td><td>نام <code>z_grid</code> جدا بساز و Restart &amp; Run All را معیار قرار بده.</td></tr><tr><td><code>01.ipynb</code></td><td>Threshold دودویی روی Target سه‌کلاسه اعمال می‌شود و Class ۲ حذف می‌شود.</td><td>مثال Binary و Multi-class را جدا نگه دار.</td></tr><tr><td><code>01.ipynb</code></td><td>Z-score در پایان روی X بازنویسی‌شده محاسبه می‌شود، نه آرایهٔ اصلی اندازه‌ها.</td><td>State متغیرها را صریح و نام‌ها را دامنه‌دار نگه دار.</td></tr><tr><td><code>02.ipynb</code></td><td>Cell پایانی از متغیر تعریف‌نشدهٔ <code>transformer</code> استفاده می‌کند و خروجی ذخیره‌شده با کد فعلی هم‌راستا نیست.</td><td><code>preprocess</code> را استفاده و Notebook را از صفر اجرا کن.</td></tr><tr><td><code>03.ipynb</code></td><td><code>accuracy_score</code> در Loop دستی Import نشده است.</td><td>Importها را در خود Notebook کامل کن.</td></tr><tr><td><code>03.ipynb</code></td><td><code>RandomizedSearchCV(n_iter=15)</code> بدون Estimator و توزیع پارامتر ساخته شده و اجرا را متوقف می‌کند، ولی خروجی Cell قدیمی‌تر است.</td><td>State ذخیره‌شده را با اجرای تمیز اشتباه نگیر.</td></tr><tr><td><code>03.ipynb</code></td><td>Classification Report روی همان X آموزش محاسبه می‌شود.</td><td>Test یا Nested CV برای گزارش نهایی لازم است.</td></tr><tr><td><code>06.py</code></td><td>حد بالای محور x از ستون دوم گرفته شده است.</td><td><code>X[:,0].max()</code> را برای xlim استفاده کن.</td></tr><tr><td><code>08.py</code></td><td>فهرست عنوان‌ها با مقادیر واقعی C یکی نیست و داده بدون <code>random_state</code> هر بار عوض می‌شود.</td><td>عنوان را از خود c بساز و Seed را ثابت کن.</td></tr><tr><td><code>11.py</code> و <code>svm_.py</code></td><td>Scaler پیش از Split روی کل X Fit شده است.</td><td>Scaler و SVC را داخل Pipeline قرار بده.</td></tr></tbody></table></div>
+  <div class="note ok"><strong>روال پیشنهادی:</strong> Kernel را Restart کن، Run All بزن، Shapeها را کنترل کن، Split را پیش از هر Fit انجام بده و نتیجهٔ نهایی را فقط روی دادهٔ واقعاً ندیده گزارش کن.</div>
+</section>
+
+<section class="section card quiz" id="review">
+  <h2 class="section-title">۱۶. خودآزمایی مفهومی</h2>
+  <details><summary>چرا Thresholdکردن خروجی Linear Regression جای Logistic Regression را نمی‌گیرد؟</summary><p>خروجی خط محدود به صفر و یک نیست، نسبت به Outlier حساس است و Loss آن برای Probability طراحی نشده است. Logistic Regression Probability و Loss مناسب Classification می‌سازد.</p></details>
+  <details><summary>فرق <code>predict</code> و <code>predict_proba</code> چیست؟</summary><p>اولی Label نهایی می‌دهد؛ دومی توزیع Probability Classها را نگه می‌دارد و امکان تحلیل Confidence یا تغییر Threshold را فراهم می‌کند.</p></details>
+  <details><summary>چرا StandardScaler باید داخل Pipeline باشد؟</summary><p>تا فقط روی Train هر Fold Fit شود و همان پارامترها روی Validation/Test اجرا شوند؛ در غیر این صورت Leakage رخ می‌دهد.</p></details>
+  <details><summary>Support Vector چه نقشی در SVM دارد؟</summary><p>نمونه‌های نزدیک Margin هستند که جای مرز تصمیم را تعیین می‌کنند؛ نقاط دورتر معمولاً اثر مستقیم کمتری دارند.</p></details>
+  <details><summary>C بزرگ همیشه بهتر است؟</summary><p>نه. C بزرگ خطای Train را شدیدتر جریمه می‌کند و می‌تواند مرز را به Noise حساس کند. مقدار مناسب باید با Validation انتخاب شود.</p></details>
+  <details><summary>gamma بزرگ در RBF چه اثری دارد؟</summary><p>اثر هر Sample را محلی‌تر و مرز را منعطف‌تر می‌کند؛ اگر بیش از حد بزرگ باشد خطر Overfitting بالا می‌رود.</p></details>
+  <details><summary>چرا Accuracy حدود ۰٫۹۸ Notebook سوم نتیجهٔ نهایی محسوب نمی‌شود؟</summary><p>چون Prediction و Report روی همان X استفاده‌شده برای Fit محاسبه شده است؛ Training Performance است، نه Test Performance.</p></details>
+</section>
+
+<section class="section card" id="glossary">
+  <h2 class="section-title">واژه‌نامهٔ سریع جلسهٔ پنجم</h2>
+  <div class="table-wrap"><table><thead><tr><th>اصطلاح</th><th>معنای کاربردی</th></tr></thead><tbody><tr><td>Logit / Decision Score</td><td>خروجی خام پیش از تبدیل به Probability یا Class.</td></tr><tr><td>Sigmoid</td><td>تابعی که عدد حقیقی را به بازهٔ صفر و یک می‌برد.</td></tr><tr><td>Cross-Entropy</td><td>Loss حساس به Probability Class درست.</td></tr><tr><td>Threshold</td><td>مرز تبدیل Score/Probability به تصمیم نهایی.</td></tr><tr><td>ColumnTransformer</td><td>اجرای Transformerهای متفاوت روی گروه‌های ستون.</td></tr><tr><td>Pipeline</td><td>قرارداد ثابت اجرای Preprocessing و Model.</td></tr><tr><td>Margin</td><td>فاصلهٔ مرز SVM تا نزدیک‌ترین Sampleهای تعیین‌کننده.</td></tr><tr><td>Support Vector</td><td>Sample نزدیک Margin که جای مرز را تعیین می‌کند.</td></tr><tr><td>Kernel</td><td>محاسبهٔ شباهت متناظر با فضای Feature غنی‌تر.</td></tr><tr><td>C</td><td>شدت جریمهٔ خطای Train در SVM.</td></tr><tr><td>gamma</td><td>محدودهٔ اثر هر Sample در Kernelهایی مانند RBF.</td></tr><tr><td>One-Class SVM</td><td>مدل‌کردن ناحیهٔ دادهٔ عادی برای تشخیص Anomaly.</td></tr></tbody></table></div>
+  <div class="note ok"><strong>جمع‌بندی:</strong> جلسهٔ پنجم یک Classifier را از سه زاویه می‌سازد: خروجی و Loss آن، مسیر سالم آماده‌سازی داده، و هندسهٔ مرز تصمیم. اگر Probability، Pipeline و Evaluation درست نباشند، پیچیده‌ترین Kernel هم نتیجهٔ قابل‌اعتماد نمی‌سازد.</div>
+</section>
+</main></div>
+  <a class="back" href="#start" aria-label="بازگشت به بالا">↑</a>
+  <dialog id="search-dialog" aria-labelledby="search-title"><div class="search-box"><label id="search-title" for="search-input">جستجو</label><input class="search-input" id="search-input" type="search" autocomplete="off" placeholder="نام مفهوم، ابزار یا کد را بنویس"><button class="close-search" id="close-search" type="button" aria-label="بستن جستجو">Esc</button></div><ul class="search-results" id="search-results" aria-live="polite"></ul></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+(() => {
+  const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+  const root=document.documentElement, body=document.body, sidebar=$("#sidebar"), overlay=$("#drawer-overlay"), menu=$("#menu-button"), toast=$("#toast");
+  let toastTimer;
+  const showToast=text=>{toast.textContent=text;toast.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove("show"),1700)};
+  const storedTheme=localStorage.getItem("ml-doc-theme");
+  const preferred=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";
+  const setTheme=theme=>{root.dataset.theme=theme;$("#theme-toggle").setAttribute("aria-label",theme==="dark"?"فعال‌کردن پوستهٔ روشن":"فعال‌کردن پوستهٔ تیره")};
+  setTheme(storedTheme||preferred);
+  $("#theme-toggle").addEventListener("click",()=>{const next=root.dataset.theme==="dark"?"light":"dark";setTheme(next);localStorage.setItem("ml-doc-theme",next);showToast(next==="dark"?"پوستهٔ تیره فعال شد":"پوستهٔ روشن فعال شد")});
+  const setDrawer=open=>{sidebar.classList.toggle("open",open);overlay.classList.toggle("show",open);body.classList.toggle("drawer-open",open);menu.setAttribute("aria-expanded",String(open));if(open)sidebar.focus()};
+  menu.addEventListener("click",()=>setDrawer(!sidebar.classList.contains("open")));overlay.addEventListener("click",()=>setDrawer(false));
+  $$(".sidebar a").forEach(a=>a.addEventListener("click",()=>setDrawer(false)));addEventListener("keydown",e=>{if(e.key==="Escape"&&sidebar.classList.contains("open"))setDrawer(false)});
+
+  const sections=[$("#start"),...$$("main section[id]")].filter(Boolean);
+  sections.forEach((section,index)=>{
+    const heading=$("h1,h2",section); if(!heading)return;
+    if(heading.tagName==="H2"){const wrap=document.createElement("div");wrap.className="section-heading";heading.before(wrap);wrap.append(heading);const button=document.createElement("button");button.className="permalink";button.type="button";button.textContent="#";button.setAttribute("aria-label","کپی لینک این بخش");button.addEventListener("click",()=>copyLink(section.id));wrap.append(button)}
+    if(section.classList.contains("hero"))return;
+    const nav=document.createElement("nav");nav.className="section-nav";nav.setAttribute("aria-label","پیمایش بین بخش‌ها");const prev=sections[index-1],next=sections[index+1];nav.innerHTML=`${prev?`<a href="#${prev.id}">→ ${$("h1,h2",prev)?.textContent||"قبلی"}</a>`:"<span></span>"}<span class="related"></span>${next?`<a class="next" href="#${next.id}">${$("h1,h2",next)?.textContent||"بعدی"} ←</a>`:"<span></span>"}`;section.append(nav)
+  });
+  $$("main h3").forEach((heading,index)=>{if(!heading.id)heading.id=`subtopic-${index+1}`;const wrap=document.createElement("div");wrap.className="sub-heading";heading.before(wrap);wrap.append(heading);const button=document.createElement("button");button.className="permalink";button.type="button";button.textContent="#";button.setAttribute("aria-label","کپی لینک این زیربخش");button.addEventListener("click",()=>copyLink(heading.id));wrap.append(button)});
+  async function copyLink(id){const url=location.href.split("#")[0]+"#"+id;try{await navigator.clipboard.writeText(url);showToast("لینک بخش کپی شد")}catch{location.hash=id}}
+
+  $$("pre").forEach((pre,index)=>{
+    if(pre.closest(".code-block"))return;
+    const section=pre.closest("section");
+    const file=pre.dataset.file||`example-${String(index+1).padStart(2,"0")}.py`;
+    const summaryText=pre.dataset.summary||"نمایش نمونه‌کد";
+    const highlighted=(pre.dataset.highlight||"").split(",").map(Number).filter(Boolean);
+    const raw=pre.textContent.replace(/^\s*\n|\n\s*$/g,"");
+    const code=document.createElement("code");
+    raw.split("\n").forEach((value,lineIndex)=>{const line=document.createElement("span");line.className="line"+(highlighted.includes(lineIndex+1)?" hl":"");line.dataset.line=String(lineIndex+1);line.textContent=value;code.append(line)});
+    pre.replaceChildren(code);
+    const figure=document.createElement("figure");figure.className="code-block";figure.dataset.code="";
+    const caption=document.createElement("figcaption");caption.className="code-head";caption.innerHTML=`<span class="code-file">${file}</span><span class="code-language">Python</span><button class="copy-code" type="button" aria-label="کپی کد ${file}">Copy</button>`;
+    pre.before(figure);figure.append(caption,pre);
+    const details=document.createElement("details");details.className="code-disclosure";details.open=pre.dataset.open==="true";
+    const summary=document.createElement("summary");summary.textContent=summaryText;figure.before(details);details.append(summary,figure);
+    caption.querySelector("button").addEventListener("click",async()=>{const value=$$(".line",figure).map(x=>x.textContent).join("\n");try{await navigator.clipboard.writeText(value);showToast("کد کپی شد")}catch{showToast("کپی خودکار در این مرورگر ممکن نیست")}});
+    if(section)section.dataset.hasCode="true"
+  });
+  $$(".table-wrap").forEach((wrap,index)=>{const rows=wrap.querySelectorAll("tbody tr").length;if(rows<6||wrap.closest("details"))return;const details=document.createElement("details");details.className="table-disclosure";details.open=index===0;const summary=document.createElement("summary");summary.textContent=`نمایش جدول کامل (${rows} ردیف)`;wrap.before(details);details.append(summary,wrap)});
+
+  const tocLinks=$$(".toc"), tocById=new Map(tocLinks.map(a=>[a.getAttribute("href").slice(1),a]));
+  const activate=id=>{tocLinks.forEach(a=>a.removeAttribute("aria-current"));const link=tocById.get(id);if(link){link.setAttribute("aria-current","true");link.closest("details")?.setAttribute("open","")}};
+  const observer=new IntersectionObserver(entries=>{const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top)[0];if(visible)activate(visible.target.id)},{rootMargin:"-18% 0px -65% 0px",threshold:[0,.2,.5]});sections.forEach(s=>observer.observe(s));activate("start");
+
+  const dialog=$("#search-dialog"), input=$("#search-input"), results=$("#search-results");
+  const normalize=s=>(s||"").toLocaleLowerCase("fa").replace(/[ي]/g,"ی").replace(/[ك]/g,"ک").replace(/\s+/g," ").trim();
+  const index=sections.map(s=>({id:s.id,title:$("h1,h2",s)?.textContent||s.id,text:normalize(s.textContent)}));
+  const render=q=>{const n=normalize(q);const found=(n?index.filter(x=>x.text.includes(n)):index.slice(0,8)).slice(0,12);results.innerHTML="";if(!found.length){results.innerHTML='<li class="search-empty">نتیجه‌ای پیدا نشد؛ عبارت کوتاه‌تری امتحان کن.</li>';return}found.forEach(item=>{const li=document.createElement("li"),a=document.createElement("a");a.href="#"+item.id;a.innerHTML=`<span class="result-title">${item.title}</span><span class="result-snippet">رفتن مستقیم به این بخش</span>`;a.addEventListener("click",()=>dialog.close());li.append(a);results.append(li)})};
+  const openSearch=()=>{render(input.value);dialog.showModal();input.focus()};
+  $("#search-trigger").addEventListener("click",openSearch);$("#close-search").addEventListener("click",()=>dialog.close());input.addEventListener("input",()=>render(input.value));
+  addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();dialog.open?dialog.close():openSearch()}if(e.key==="Escape"&&dialog.open)dialog.close()});
+
+  $$('[data-tabs]').forEach((tabs,tabsIndex)=>{
+    const buttons=$$('[role="tab"]',tabs),panels=$$('[role="tabpanel"]',tabs);
+    const activate=button=>{const name=button.dataset.tab;buttons.forEach(b=>{const active=b===button;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1});panels.forEach(panel=>{panel.hidden=panel.dataset.panel!==name})};
+    buttons.forEach((button,index)=>{if(!button.id)button.id=`tabs-${tabsIndex+1}-tab-${index+1}`;const panel=panels.find(p=>p.dataset.panel===button.dataset.tab);if(panel){if(!panel.id)panel.id=`tabs-${tabsIndex+1}-panel-${index+1}`;button.setAttribute('aria-controls',panel.id);panel.setAttribute('aria-labelledby',button.id)}button.addEventListener('click',()=>activate(button));button.addEventListener('keydown',event=>{if(!['ArrowRight','ArrowLeft','Home','End'].includes(event.key))return;event.preventDefault();let next=index;if(event.key==='ArrowRight')next=(index-1+buttons.length)%buttons.length;if(event.key==='ArrowLeft')next=(index+1)%buttons.length;if(event.key==='Home')next=0;if(event.key==='End')next=buttons.length-1;activate(buttons[next]);buttons[next].focus()})});
+    activate(buttons.find(b=>b.getAttribute('aria-selected')==='true')||buttons[0]);
+  });
+})();
+</script>
+</body>
+</html>
