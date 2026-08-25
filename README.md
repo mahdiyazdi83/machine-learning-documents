@@ -15,6 +15,7 @@ These documents turn each recorded class into a structured learning experience. 
 | 04 · Reference | [Topic Reference](sessions/04-metrics-validation-and-model-delivery/ml-session-04-topic-reference.html) | A topic-first companion for deeper review |
 | 05 | [Logistic Regression, Pipelines, and SVM](sessions/05-logistic-regression-pipelines-and-svm/ml-session-05.html) | A complete classification workflow |
 | 06 | [Decision Trees, GPU, and OpenCV](sessions/06-decision-trees-gpu-and-opencv/ml-session-06.html) | Interpretable trees, accelerated ML, and image fundamentals |
+| 07 | [Unsupervised Learning, K-Means, and Computer Vision](sessions/07-unsupervised-learning/ml-session-07.html) | Finding unlabeled patterns and turning image pixels into detectable regions and objects |
 
 ## How to read the documents
 
