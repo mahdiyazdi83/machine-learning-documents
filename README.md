@@ -16,6 +16,7 @@ These documents turn each recorded class into a structured learning experience. 
 | 05 | [Logistic Regression, Pipelines, and SVM](sessions/05-logistic-regression-pipelines-and-svm/ml-session-05.html) | A complete classification workflow |
 | 06 | [Decision Trees, GPU, and OpenCV](sessions/06-decision-trees-gpu-and-opencv/ml-session-06.html) | Interpretable trees, accelerated ML, and image fundamentals |
 | 07 | [Unsupervised Learning, K-Means, and Computer Vision](sessions/07-unsupervised-learning/ml-session-07.html) | Finding unlabeled patterns and turning image pixels into detectable regions and objects |
+| 08 | [Ensemble Learning, Bagging, and Boosting](sessions/08-ensemble-learning/ml-session-08.html) | Combining diverse models with Random Forest, AdaBoost, Stacking, and Gradient Boosting |
 
 ## How to read the documents
 
