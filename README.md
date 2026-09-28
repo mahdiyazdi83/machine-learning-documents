@@ -18,6 +18,7 @@ These documents turn each recorded class into a structured learning experience. 
 | 07 | [Unsupervised Learning, K-Means, and Computer Vision](sessions/07-unsupervised-learning/ml-session-07.html) | Finding unlabeled patterns and turning image pixels into detectable regions and objects |
 | 08 | [Ensemble Learning, Bagging, and Boosting](sessions/08-ensemble-learning/ml-session-08.html) | Combining diverse models with Random Forest, AdaBoost, Stacking, and Gradient Boosting |
 | 09 | [Neural Networks and Backpropagation](sessions/09-neural-networks-and-backpropagation/ml-session-09.html) | Following the learning path from artificial neurons and activations to MLP training |
+| 10 | [Cross-Validation, Dimensionality Reduction, and Model Delivery](sessions/10-cross-validation-dimensionality-reduction-and-delivery/ml-session-10.html) | Evaluating generalization, reducing dimensions, detecting spam, and moving models beyond notebooks |
 
 ## How to read the documents
 
