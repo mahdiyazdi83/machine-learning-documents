@@ -19,6 +19,7 @@ These documents turn each recorded class into a structured learning experience. 
 | 08 | [Ensemble Learning, Bagging, and Boosting](sessions/08-ensemble-learning/ml-session-08.html) | Combining diverse models with Random Forest, AdaBoost, Stacking, and Gradient Boosting |
 | 09 | [Neural Networks and Backpropagation](sessions/09-neural-networks-and-backpropagation/ml-session-09.html) | Following the learning path from artificial neurons and activations to MLP training |
 | 10 | [Cross-Validation, Dimensionality Reduction, and Model Delivery](sessions/10-cross-validation-dimensionality-reduction-and-delivery/ml-session-10.html) | Evaluating generalization, reducing dimensions, detecting spam, and moving models beyond notebooks |
+| 11 · Final | [Density Clustering, Autoencoders, and Semi-Supervised Learning](sessions/11-density-clustering-autoencoders-and-semi-supervised-learning/ml-session-11.html) | Learning from density and image structure, reconstructing MNIST, using limited labels, and preparing the final project |
 
 ## How to read the documents
 
@@ -61,7 +62,7 @@ Session 04 also includes a **topic-first reference**. Read the regular session d
 
 ## About this repository
 
-This repository is maintained as a shared learning resource for classmates and anyone following the same machine-learning path. New session documents will be added as the course progresses.
+This repository is maintained as a shared learning resource for classmates and anyone following the same machine-learning path. All eleven recorded sessions are now documented, including the final session on density clustering, image reconstruction, semi-supervised learning, and the course project. Session 04 also has a topic-first reference companion.
 
 ---
 
